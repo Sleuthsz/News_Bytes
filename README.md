@@ -1,4 +1,16 @@
-# News_Scraper
+# News Scraper
+
+## Team Members
+
+**Daniel Brott**
+
+**Monika Davies**
+
+**Alejandro Rivera**
+
+**Andy Nguyen**
+
+**Natalija Germek**
 
 ## Team Agreement
 
