@@ -86,7 +86,7 @@ Communicate async via Slack 24/7 (2 time zones, PST, central). Group work during
 
 **What platforms will you use to communicate (ie. Slack, phone …)?**
 
-Slack
+Slack and as a back-up email.
 
 **How often will you take breaks?**
 
