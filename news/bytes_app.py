@@ -19,6 +19,11 @@ driver = webdriver.Chrome(options=options, service=webdriver_service)
 driver.get("https://www.bbc.com")
 driver.implicitly_wait(1)
 
+openai_model = "text-ada-001"
+# openai_model = "text-babbage-001"
+# openai_model = "text-curie-001"
+# openai_model = "text-davinci-003"
+
 
 def get_headlines():
     link = driver.find_elements(By.CLASS_NAME, "media__link")
@@ -30,21 +35,32 @@ def get_headlines():
     return headlines_links
 
 
+def get_article_text(link):
+    driver.get(link)
+    article = driver.find_element(By.TAG_NAME, "article")
+    elements = article.find_elements(By.XPATH, "//div[@data-component='text-block']")
+    text = ""
+    for element in elements:
+        text += element.text
+    return text
+
+
+def get_summary(text):
+    prompt = f"{text}\n\nTl;dr"
+    response = openai.Completion.create(
+        model=openai_model,
+        prompt=prompt,
+        temperature=0.7,
+        max_tokens=140,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=1
+    )
+    return response["choices"][0]["text"]
+
+
 if __name__ == "__main__":
-    # print(get_headlines()
     links = get_headlines()
-    print(links[1][1])
-    print("==================")
-    driver.get(links[1][1])
-    element = driver.find_element(By.TAG_NAME, "article")
-    print(element.text)
-    prompt = f"Summarize this: {element.text}"
-    # print(prompt)
-    # response = openai.Completion.create(
-    #     model="text-ada-001",
-    #     prompt=prompt,
-    #     temperature=0.6,
-    # )
-    # print("==================")
-    #
-    # print(response)
+    article_text = get_article_text(links[0][1])
+    summary = get_summary(article_text)
+    print(summary)
