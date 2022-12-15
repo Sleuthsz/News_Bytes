@@ -3,39 +3,49 @@ from rich.console import Console
 from rich.table import Table
 from rich import print
 from rich.panel import Panel
+from rich.progress import track
+from time import sleep
+from rich.columns import Columns
+from rich import box
+import sys
 
-
+console = Console()
 def headlines_table():
-    table = Table(title="News_Bytes", show_lines=True)
+    table = Table(show_lines=True, row_styles=["dim", ""], title_justify="center", box=box.HEAVY_EDGE)
 
-    table.add_column("Headlines", justify="center", style="magenta")
+    table.add_column("Headlines", justify="center", style="light_steel_blue", header_style="light_sky_blue1")
 
-    for headline in get_headlines():
+    for index, headline in enumerate(get_headlines()):
         table.add_row(headline[0])
-    return table
+    console.print(table, justify="center")
+
+# TODO: layout to panel completion
+def categories_panel():
+    news = ['[blue]News', '[magenta]Business', '[blue]World News', '[magenta]Tech', '[blue]Sports']
+    news_render = [Panel(category, expand=True) for category in news]
+    console.print(Columns(news_render), justify="center")
+
+
+def prompt_user():
+    console.print('Enter a category if you wish to see more headlines,\n otherwise enter in a headline number in order to get a summary \n with a link to the article. If you wish to quit, enter (q)uit', justify="center")
+
+
+def get_user_input():
+    news = ['news', 'business', 'world news', 'tech', 'sports']
+    user_input = input('> ')
+    while user_input.lower() != 'q' or user_input.lower() != 'quit':
+        if user_input in get_headlines().lower():
+            #TODO: When the user specifies a headline we return that specific article
+            pass
+        elif user_input.lower() in news1:
+            #TODO: When the user specifies a category we return a new list of articles in that category
+            pass
+        elif user_input.lower() == 'r' or user_input.lower() == 'return':
+            #TODO Returns user to a previous menu or state
+            pass
+
 
 
 headlines_table()
-
-
-# TOTO: layout to panel completion
-def categories_panel():
-    print(Panel.fit("[green]News!"))
-    print(Panel.fit("[green]Business!"))
-    print(Panel.fit("[green]World News!"))
-    print(Panel.fit("[green]Tech!"))
-    print(Panel.fit("[green]Sports!"))
-
-    # table.add_column("News", justify="center", style="green", no_wrap=True)
-    # table.add_column("Business", justify="center", style="green")
-    # table.add_column("World News", justify="center", style="green")
-    # table.add_column("Tech", justify="center", style="green")
-    # table.add_column("Sports", justify="center", style="green")
-
-
-# TODO:
-# table.add_row("input()")
-
-console = Console()
-console.print(headlines_table())
 categories_panel()
+prompt_user()
