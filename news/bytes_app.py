@@ -61,6 +61,7 @@ def get_summary(text):
 
 if __name__ == "__main__":
     links = get_headlines()
-    article_text = get_article_text(links[0][1])
+    article_text = get_article_text(links[1][1])
     summary = get_summary(article_text)
     print(summary)
+    print(article_text)
