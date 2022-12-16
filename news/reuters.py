@@ -16,11 +16,12 @@ homedir = os.path.expanduser("~")
 webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
 
 driver = webdriver.Chrome(options=options, service=webdriver_service)
-driver.get("https://www.reuters.com/")
-driver.implicitly_wait(1)
 
 
-def get_headlines():
+def get_news_headlines(link="https://www.reuters.com/"):
+    driver.get(link)
+    driver.implicitly_wait(1)
+
     heads = driver.find_elements(By.XPATH, "//a[@data-testid='Heading']")
 
     headlines_links = []
@@ -34,8 +35,26 @@ def get_headlines():
     return headlines_links
 
 
+def get_business_headlines():
+    return get_news_headlines('https://www.reuters.com/business/')
+
+
+def get_world_news_headlines():
+    return get_news_headlines('https://www.reuters.com/world/')
+
+
+def get_tech_headlines():
+    return get_news_headlines('https://www.reuters.com/technology/')
+
+
+def get_sports_headlines():
+    return get_news_headlines('https://reuters.com/lifestyle/sports/')
+
+
 def get_article_text(link):
     driver.get(link)
+    driver.implicitly_wait(1)
+
     article = driver.find_element(By.TAG_NAME, "article")
     elements = article.find_elements(By.XPATH, "//p")
     text = ""
@@ -44,8 +63,7 @@ def get_article_text(link):
     return text
 
 if __name__ == "__main__":
-    #print(get_article_text('https://www.reuters.com/markets/us/fed-set-slow-pace-rate-hikes-inflation-grinch-loses
-# -steam-2022-12-14/'))
+    print(get_article_text('https://www.reuters.com/markets/us/fed-set-slow-pace-rate-hikes-inflation-grinch-loses-steam-2022-12-14/'))
     #print(get_article_text('https://www.reuters.com/legal/crypto-exchange-ftx-fights-bahamas-demand-data-access-2022
 # -12-14/'))
-    print(get_headlines())
+    #print(get_sports_headlines())
