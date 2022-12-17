@@ -6,3 +6,4 @@ attrs~=22.1.0
 setuptools==65.6.3
 packaging~=22.0
 pytest~=7.2.0
+rich~=12.6.0

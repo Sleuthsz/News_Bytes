@@ -27,6 +27,12 @@
 #### V 1.0
 *Initial creation of News_Bytes Project to include Trello setup and documentation/development planning* - 10 Dec 2022
 
+#### V 1.1
+*Initial creation of function get_headlines() to scrape the top ten headlines. Initialization of ChatGPT for scraping - 12 Dec 2022*
+
+#### V 1.2
+*Initial implementation of Rich library with headlines_table() and categories_panel() in menu.py. - 13 Dec 2022*
+
 ---
 
 ## Getting Started
@@ -69,6 +75,9 @@ Unit testing is included in the tests folder in your project using the pytest te
 1.0 Initial creation of News_Bytes Project to include Trello setup and documentation/development planning - 10 Dec 2022
 
 1.1 Initial creation of function get_headlines() to scrape the top ten headlines. Initialization of ChatGPT for scraping - 12 Dec 2022
+
+1.2 Initial implementation of Rich library with headlines_table() and categories_panel() in menu.py. - 13 Dec 2022
+
 
 ---
 
