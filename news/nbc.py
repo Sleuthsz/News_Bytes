@@ -7,7 +7,6 @@ import os
 
 
 class NBC:
-
     options = Options()
     options.headless = True
 
@@ -38,15 +37,21 @@ class NBC:
         return text
 
     def get_business_headlines(self):
-        self.nbc_driver.get('https://www.nbcnews.com/business')
-        business_link = self.nbc_driver.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
+        section = self.nbc_driver.find_elements(By.TAG_NAME, 'section')[2]
+        business_links = section.find_elements(By.TAG_NAME, 'a')
 
         business_headlines_links = []
-        for i in range(10):
-            business_headlines_links.append((business_link[i].text, business_link[i].get_attribute('h2')))
-    # print(link[i].get_attribute('href'))
-        self.get_article_text()
-        return business_headlines_links
+        for element in business_links:
+
+            link = element.get_attribute('href')
+            try:
+                head = element.find_element(By.TAG_NAME, 'h2').text
+            except:
+                continue
+
+            business_headlines_links.append((head, link))
+
+        return business_headlines_links[0:10]
 
     def get_world_news_headlines(self):
         self.nbc_driver.get('https://www.nbcnews.com/world')
@@ -55,8 +60,8 @@ class NBC:
         world_news_headlines_links = []
         for i in range(10):
             world_news_headlines_links.append((world_news_link[i].text, world_news_link[i].get_attribute('href')))
-    # print(link[i].get_attribute('href'))
-        self.get_article_text()
+        # print(link[i].get_attribute('href'))
+        #     self.get_article_text()
         return world_news_headlines_links
 
     def get_tech_headlines(self):
@@ -66,20 +71,20 @@ class NBC:
         tech_news_headlines_links = []
         for i in range(10):
             tech_news_headlines_links.append((tech_news_link[i].text, tech_news_link[i].get_attribute('href')))
-    # print(link[i].get_attribute('href'))
-        self.get_article_text()
+        # print(link[i].get_attribute('href'))
+        #     self.get_article_text()
         return tech_news_headlines_links
 
     def get_sports_headlines(self):
         self.nbc_driver.get('https://www.nbcsports.com/?cid=eref:nbcnews:text')
-        sports_link = self.nbc_driver.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
+        sports_link = self.nbc_driver.find_elements(By.CLASS_NAME, "more-headlines__list-item")
 
-        business_headlines_links = []
-        for i in range(10):
-            business_headlines_links.append((sports_link[i].text, sports_link[i].get_attribute('href')))
-    # print(link[i].get_attribute('href'))
-        self.get_article_text(self, sports_link)
+        sports_links = []
+        for i in range(len(sports_links)):
+            sports_links.append((sports_link[i].text, sports_link[i].get_attribute('href')))
+        # print(link[i].get_attribute('href'))
         return sports_link
+
 
 # nbc_key = os.getenv("NBC_KEY")
 # GET https://newsapi.org/v2/top-headlines?country=us&apiKey=nbc_key
@@ -97,8 +102,10 @@ if __name__ == "__main__":
     print(links)
     business = nbc.get_business_headlines()
     print(business)
-    tech = nbc.get_tech_headlines()
-    print(tech)
+    # tech = nbc.get_tech_headlines()
+    # print(tech)--broken
+    # sports = nbc.get_sports_headlines()
+    # print(sports)
     # article_test = get_article_text()
     # print(article_test)
     # categories = get_categories()
@@ -110,7 +117,6 @@ if __name__ == "__main__":
     # print(summary)
     # print(article_text)
     # get_article_text()
-
 
 # --------
 
