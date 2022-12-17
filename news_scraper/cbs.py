@@ -2,16 +2,15 @@ import os
 
 import openai
 from dotenv import load_dotenv
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+
+import news
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-class CBSNewsScraper:
+class CBS(news.News):
     FRONT_PAGE_URL = "https://www.cbsnews.com/"
     BUSINESS_PAGE_URL = f"{FRONT_PAGE_URL}moneywatch"
     WORLD_PAGE_URL = f"{FRONT_PAGE_URL}world"
@@ -23,24 +22,23 @@ class CBSNewsScraper:
     WORLD_PAGE_ID = "component-topic-world"
     TECHNOLOGY_PAGE_ID = "component-topic-technology"
 
-    def __init__(self, driver, options):
-        self.driver = driver
-        self.options = options
+    def __init__(self):
+        super().__init__()
 
     def get_news_headlines(self):
-        return self.get_headlines_and_links(CBSNewsScraper.FRONT_PAGE_URL, CBSNewsScraper.FRONT_PAGE_ID)
+        return self.get_headlines_and_links(CBS.FRONT_PAGE_URL, CBS.FRONT_PAGE_ID)
 
     def get_business_headlines(self):
-        return self.get_headlines_and_links(CBSNewsScraper.BUSINESS_PAGE_URL, CBSNewsScraper.BUSINESS_PAGE_ID)
+        return self.get_headlines_and_links(CBS.BUSINESS_PAGE_URL, CBS.BUSINESS_PAGE_ID)
 
     def get_world_news_headlines(self):
-        return self.get_headlines_and_links(CBSNewsScraper.WORLD_PAGE_URL, CBSNewsScraper.WORLD_PAGE_ID)
+        return self.get_headlines_and_links(CBS.WORLD_PAGE_URL, CBS.WORLD_PAGE_ID)
 
     def get_tech_news_headlines(self):
-        return self.get_headlines_and_links(CBSNewsScraper.TECHNOLOGY_PAGE_URL, CBSNewsScraper.TECHNOLOGY_PAGE_ID)
+        return self.get_headlines_and_links(CBS.TECHNOLOGY_PAGE_URL, CBS.TECHNOLOGY_PAGE_ID)
 
     def get_sports_headlines(self):
-        return self.get_sports_headlines_and_links(CBSNewsScraper.SPORTS_PAGE_URL)
+        return self.get_sports_headlines_and_links(CBS.SPORTS_PAGE_URL)
 
     def get_headlines_and_links(self, link, element_id):
         article_headlines_and_links = []
@@ -57,7 +55,7 @@ class CBSNewsScraper:
         return article_headlines_and_links
 
     def get_article_text(self, link):
-        if CBSNewsScraper.SPORTS_PAGE_URL in link:
+        if CBS.SPORTS_PAGE_URL in link:
             return self.get_sports_article_text(link)
         else:
             self.driver.get(link)
@@ -106,19 +104,10 @@ class CBSNewsScraper:
 
 
 if __name__ == '__main__':
-    homedir = os.path.expanduser("~")
-    webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
-
-    options = Options()
-    options.headless = True
-
-    driver = webdriver.Chrome(options=options, service=webdriver_service)
-    driver.implicitly_wait(1)
-
-    cbs_scraper = CBSNewsScraper(driver, options)
+    cbs_scraper = CBS()
 
     articles = cbs_scraper.get_sports_headlines()
     for article in articles:
-        print(cbs_scraper.get_sports_article_text(article[1]))
+        print(cbs_scraper.get_article_text(article[1]))
         print(">>>>>>>>>>>>>>>>")
         # print(article[1])

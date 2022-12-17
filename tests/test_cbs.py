@@ -1,25 +1,11 @@
-import os
-
 import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 
-from news.scrape_cbs import CBSNewsScraper
+from news_scraper.cbs import CBS
 
 
 @pytest.fixture
 def setup():
-    homedir = os.path.expanduser("~")
-    webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
-
-    options = Options()
-    options.headless = True
-
-    driver = webdriver.Chrome(options=options, service=webdriver_service)
-    driver.implicitly_wait(1)
-
-    cbs_scraper = CBSNewsScraper(driver, options)
+    cbs_scraper = CBS()
     return cbs_scraper
 
 
