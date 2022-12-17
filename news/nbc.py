@@ -5,84 +5,100 @@ from selenium.webdriver.common.by import By
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-# nbc_key = os.getenv("NBC_KEY")
-# GET https://newsapi.org/v2/top-headlines?country=us&apiKey=nbc_key
 
-options = Options()
-options.headless = True
+class NBC:
 
-homedir = os.path.expanduser("~")
-webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
+    options = Options()
+    options.headless = True
 
+    load_dotenv()
+    homedir = os.path.expanduser("~")
+    webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
+    nbc_driver = webdriver.Chrome(options=options, service=webdriver_service)
+    nbc_driver.get("https://www.nbcnews.com")
+    nbc_driver.implicitly_wait(1)
 
-nbc_driver = webdriver.Chrome(options=options, service=webdriver_service)
+    def get_news_headlines(self):
+        link = self.nbc_driver.find_elements(By.CLASS_NAME, "related-content__headline-link")
 
-nbc_driver.get("https://www.nbcnews.com")
-nbc_driver.implicitly_wait(1)
-
-
-def get_headlines():
-    link = nbc_driver.find_elements(By.CLASS_NAME, "related-content__headline-link")
-
-    headlines_links = []
-    for i in range(len(link)):
-        headlines_links.append((link[i].text, link[i].get_attribute('href')))
+        headlines_links = []
+        for i in range(len(link)):
+            headlines_links.append((link[i].text, link[i].get_attribute('href')))
         # print(link[i].get_attribute('href'))
 
-    return headlines_links
+        return headlines_links
 
+    def get_article_text(self, link):
+        self.nbc_driver.get(link)
+        article = self.nbc_driver.find_element(By.TAG_NAME, "article")
+        elements = article.find_elements(By.XPATH, "//div[@data-component='text-block']")
+        text = ""
+        for element in elements:
+            text += element.text
+        return text
 
-def get_article_text(link):
-    nbc_driver.get(link)
-    article = nbc_driver.find_element(By.TAG_NAME, "article")
-    elements = article.find_elements(By.XPATH, "//div[@data-component='text-block']")
-    text = ""
-    for element in elements:
-        text += element.text
-    return text
+    def get_business_headlines(self):
+        self.nbc_driver.get('https://www.nbcnews.com/business')
+        business_link = self.nbc_driver.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
 
+        business_headlines_links = []
+        for i in range(10):
+            business_headlines_links.append((business_link[i].text, business_link[i].get_attribute('h2')))
+    # print(link[i].get_attribute('href'))
+        self.get_article_text()
+        return business_headlines_links
 
-def get_business():
-    # business_link = https://www.nbcnews.com/business
-    pass
+    def get_world_news_headlines(self):
+        self.nbc_driver.get('https://www.nbcnews.com/world')
+        world_news_link = self.nbc_driver.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
 
+        world_news_headlines_links = []
+        for i in range(10):
+            world_news_headlines_links.append((world_news_link[i].text, world_news_link[i].get_attribute('href')))
+    # print(link[i].get_attribute('href'))
+        self.get_article_text()
+        return world_news_headlines_links
 
-def get_world():
-    # world_link = https://www.nbcnews.com/world
-    pass
+    def get_tech_headlines(self):
+        self.nbc_driver.get('https://www.nbcnews.com/tech-media')
+        tech_news_link = self.nbc_driver.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
 
+        tech_news_headlines_links = []
+        for i in range(10):
+            tech_news_headlines_links.append((tech_news_link[i].text, tech_news_link[i].get_attribute('href')))
+    # print(link[i].get_attribute('href'))
+        self.get_article_text()
+        return tech_news_headlines_links
 
-def get_tech():
-    # tech_link = https://www.nbcnews.com/tech-media
-    pass
+    def get_sports_headlines(self):
+        self.nbc_driver.get('https://www.nbcsports.com/?cid=eref:nbcnews:text')
+        sports_link = self.nbc_driver.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
 
+        business_headlines_links = []
+        for i in range(10):
+            business_headlines_links.append((sports_link[i].text, sports_link[i].get_attribute('href')))
+    # print(link[i].get_attribute('href'))
+        self.get_article_text(self, sports_link)
+        return sports_link
 
-def get_sports():
-    # sports_link = https://www.nbcsports.com/?cid=eref:nbcnews:text
-    pass
-
-
-# too broad - refactor needed
-# def get_categories():
-#     categories_link = nbc_driver.find_elements(By.CLASS_NAME, "shortcuts-list-item")
-#     category = nbc_driver.find_element(By.TAG_NAME, "li")
-#     categories = []
-#     for i in range(len(categories_link)):
-#         categories.append((categories_link[i].text, categories_link[i].get_attribute('li')))
-#         print(categories_link[i].get_attribute('li'))
-#
-#     return get_categories()
+# nbc_key = os.getenv("NBC_KEY")
+# GET https://newsapi.org/v2/top-headlines?country=us&apiKey=nbc_key
 
 # ********* README.md update - created nbc.py for webscrape of nbc website, updated README.md - December 14, 2022
 # ********* README.md update - finalized headline and link scrape, started categories scrape, updated README.md. -
 # December 15, 2022
 
+
 if __name__ == "__main__":
-    headlines = get_headlines()
+    nbc = NBC()
+    headlines = nbc.get_news_headlines()
     print(headlines)
-    links = get_article_text(headlines[1][1])
+    links = nbc.get_article_text(headlines[1][1])
     print(links)
+    business = nbc.get_business_headlines()
+    print(business)
+    tech = nbc.get_tech_headlines()
+    print(tech)
     # article_test = get_article_text()
     # print(article_test)
     # categories = get_categories()
