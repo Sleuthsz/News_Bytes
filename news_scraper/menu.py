@@ -1,4 +1,3 @@
-from bytes_app import get_headlines, get_summary
 from rich.console import Console
 from rich.table import Table
 from rich import print
@@ -15,7 +14,9 @@ import pyfiglet
 import sys
 from rich import box
 
+import bbc
 
+bbc = bbc.BBC()
 
 
 class Menu:
@@ -32,7 +33,7 @@ class Menu:
             time.sleep(0.02)
 
 
-    def make_headlines_table(self, headlines:list[str] = get_headlines()):
+    def make_headlines_table(self, headlines:list[str] = bbc.get_news_headlines()):
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
@@ -43,7 +44,7 @@ class Menu:
         self.console.print(table, justify="center")
 
     @staticmethod
-    def check_index(number:num, numbers_list:list[num]):
+    def check_index(number:int, numbers_list:list[int]):
         if number in numbers_list:
             return numbers_list.index(number)
         return False
@@ -63,17 +64,17 @@ class Menu:
             if user_input.lower() == 'q' or user_input.lower() == 'quit':
                 if Confirm.ask("Are you sure you would like to quit?"):
                     sys.exit()
-            elif user_input in temp_list:
-                #TODO display category headlines or text
-                pass
+            # elif user_input in temp_list:
+            #     #TODO display category headlines or text
+            #     pass
 
 
 
-    def display_category_news(self, category:str, headlines: list[str] = get_headlines()):
+    def display_category_news(self, category:str, headlines: list[str] = bbc.get_news_headlines()):
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
-        table.add_column(f'{category} news', justify="center")
+        table.add_column(f'{category} news_scraper', justify="center")
 
         for index, headline in enumerate(headlines):
             table.add_row(str(index + 1), headline[0])
@@ -81,11 +82,11 @@ class Menu:
         self.console.print(table, justify="center")
 
 
-    def display_article_summary(self,headline: tuple = get_headlines()):
+    def display_article_summary(self,headline: tuple = bbc.get_news_headlines()):
         #TODO Change headlines to whatever response is
         # if user_input in headlines:
         #     self.console.print(f'[u]{Panel(get_summary(headline[0][1]))}', justify="center")
-        self.console.print(Panel(get_headlines()[0][1]), Panel(get_headlines()[0][1]), justify="center")
+        self.console.print(Panel(bbc.get_news_headlines()[0][1]), Panel(bbc.get_news_headlines()[0][1]), justify="center")
         self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
 
 
@@ -93,10 +94,10 @@ class Menu:
 # inspect('', methods=True)
 # inspect(Panel, methods=True)
 menu = Menu()
-menu.display_article_summary('Hello')
+# menu.display_article_summary('Hello')
 # menu.ascii_art()
 # # menu.progress_bar()
-# menu.make_headlines_table()
+menu.make_headlines_table()
 # menu.categories_panel()
 # menu.query_user()
 # menu.get_user_input()

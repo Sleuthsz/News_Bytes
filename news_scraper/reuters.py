@@ -1,18 +1,11 @@
-import os
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
+import news
 
-class Reuters:
-    options = Options()
-    options.headless = True
 
-    homedir = os.path.expanduser("~")
-    webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
-
-    driver = webdriver.Chrome(options=options, service=webdriver_service)
+class Reuters(news.News):
+    def __init__(self):
+        super().__init__()
 
     def get_news_headlines(self, link="https://www.reuters.com/"):
         self.driver.get(link)
