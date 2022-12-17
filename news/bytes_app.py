@@ -6,62 +6,115 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
-options = Options()
-options.headless = True
+class News:
+    def __init__(self):
+        self.title = ""
+        self.env = load_dotenv()
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        self.options = Options()
+        self.options.headless = True
+        self.homedir = os.path.expanduser("~")
+        self.webdriver_service = Service(f"{self.homedir}/chromedriver/stable/chromedriver")
+        self.driver = webdriver.Chrome(options=self.options, service=self.webdriver_service)
+        self.ai_model = {
+            'ada': "text-ada-001",
+            'babbage': "text-babbage-001",
+            'curie': "text-curie-001",
+            'davinci': "text-davinci-001",
+        }
 
-homedir = os.path.expanduser("~")
-webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
-
-driver = webdriver.Chrome(options=options, service=webdriver_service)
-driver.get("https://www.bbc.com")
-driver.implicitly_wait(1)
-
-openai_model = "text-ada-001"
-# openai_model = "text-babbage-001"
-# openai_model = "text-curie-001"
-# openai_model = "text-davinci-003"
-
-
-def get_headlines():
-    link = driver.find_elements(By.CLASS_NAME, "media__link")
-
-    headlines_links = []
-    for i in range(10):
-        headlines_links.append((link[i].text, link[i].get_attribute('href')))
-
-    return headlines_links
-
-
-def get_article_text(link):
-    driver.get(link)
-    article = driver.find_element(By.TAG_NAME, "article")
-    elements = article.find_elements(By.XPATH, "//div[@data-component='text-block']")
-    text = ""
-    for element in elements:
-        text += element.text
-    return text
+    def get_summary(self, text):
+        prompt = f"{text}\n\nTl;dr"
+        response = openai.Completion.create(
+            model=self.ai_model['ada'],
+            prompt=prompt,
+            temperature=0.7,
+            max_tokens=140,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=1
+        )
+        return response["choices"][0]["text"]
 
 
-def get_summary(text):
-    prompt = f"{text}\n\nTl;dr"
-    response = openai.Completion.create(
-        model=openai_model,
-        prompt=prompt,
-        temperature=0.7,
-        max_tokens=140,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=1
-    )
-    return response["choices"][0]["text"]
+class BBC(News):
+    def __init__(self):
+        super().__init__()
+        self.driver.implicitly_wait(1)
+
+    def get_news_headlines(self):
+        self.driver.get("https://www.bbc.com")
+        heads = self.driver.find_elements(By.CLASS_NAME, "media__link")
+        headlines_links = []
+        for i in range(10):
+            headlines_links.append((heads[i].text, heads[i].get_attribute('href')))
+        return headlines_links
+
+    def get_news_category(self, link):
+        self.driver.get(link)
+        links = self.driver.find_elements(By.CLASS_NAME, 'gs-c-promo-heading')
+
+        headlines_links = []
+        for element in links:
+            link = element.get_attribute('href')
+            if link is not None:
+                head = element.find_element(By.TAG_NAME, 'h3').text
+
+            if head is not '' and link is not None:
+                headlines_links.append((head, link))
+
+        return headlines_links[0:10]
+
+    def get_business_headlines(self):
+        return self.get_news_category('https://www.bbc.com/news/business')
+
+    def get_world_news_headlines(self):
+        return self.get_news_category('https://www.bbc.com/news/world')
+
+    def get_tech_headlines(self):
+        return self.get_news_category('https://www.bbc.com/news/technology')
+
+    def get_sports_headlines(self):
+        self.driver.get('https://www.bbc.com/sport')
+        links = self.driver.find_elements(By.CLASS_NAME, 'e1f5wbog0')
+
+        headlines_links = []
+        for element in links:
+            link = element.get_attribute('href')
+            if link is not None:
+                head = element.find_element(By.TAG_NAME, 'p').text
+
+            if head is not '' and link is not None:
+                headlines_links.append((head, link))
+
+        return headlines_links[0:10]
+
+    def get_article_text(self, link):
+        self.driver.get(link)
+        article = self.driver.find_element(By.TAG_NAME, "article")
+        elements = article.find_elements(By.XPATH, "//div[@data-component='text-block']")
+
+        if len(elements) == 0:
+            elements = self.driver.find_elements(By.XPATH, '//article/div[1]/p')
+
+        text = ""
+        for element in elements:
+            text += element.text
+        return text
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     links = get_headlines()
     article_text = get_article_text(links[1][1])
     summary = get_summary(article_text)
     print(summary)
     print(article_text)
+=======
+    bbc = BBC()
+    #print(bbc.get_tech_headlines())
+    #print(bbc.get_sports_headlines())
+    #print(bbc.get_article_text('https://www.bbc.com/news/business-64010202'))
+    print(bbc.get_article_text('https://www.bbc.com/sport/football/63926145'))
+>>>>>>> 4c685db6ac77473fe972fd260f2239aec863c076
