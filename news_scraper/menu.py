@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from rich.console import Console
 from rich.table import Table
 from rich import print
@@ -15,8 +17,8 @@ import sys
 import os
 from rich import box
 
-import bbc, guardian, cbs, reuters, news
 
+import bbc, guardian, cbs, reuters, news
 
 
 class Menu:
@@ -32,12 +34,28 @@ class Menu:
 
     def get_headlines(self):
         new_list = []
-        bbc_news = self.bbc.get_news_headlines()
-        guardian_news = self.guardian.get_news_headlines()
-        cbs_news = self.cbs.get_news_headlines()
-        reuters_news = self.reuters.get_news_headlines()
-
-        new_list += bbc_news[0:2] + guardian_news[0:2] + cbs_news[0:2] + reuters_news[0:2]
+        start_time = time.time()
+        # bbc_news = self.bbc.get_news_headlines()
+        # guardian_news = self.guardian.get_news_headlines()
+        # cbs_news = self.cbs.get_news_headlines()
+        # reuters_news = self.reuters.get_news_headlines()
+        #
+        # new_list += bbc_news[0:2] + guardian_news[0:2] + cbs_news[0:2] + reuters_news[0:2]
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            for i in range(4):
+                if i == 0:
+                    future = executor.submit(self.bbc.get_news_headlines)
+                    new_list += future.result()[:2]
+                if i == 1:
+                    future = executor.submit(self.guardian.get_news_headlines)
+                    new_list += future.result()[:2]
+                if i == 2:
+                    future = executor.submit(self.cbs.get_news_headlines)
+                    new_list += future.result()[:2]
+                if i == 3:
+                    future = executor.submit(self.reuters.get_news_headlines)
+                    new_list += future.result()[:2]
+        print(f"Time Elapsed: {time.time() - start_time}")
         return new_list
 
     def ascii_art(self):
@@ -125,7 +143,7 @@ class Menu:
             self.console.print(Panel(get_summary, box=box.HEAVY_EDGE, title='Summary', highlight=True, width=100), justify="center")
 
         elif 'cbs' in link:
-            article = self.cbsnews.get_article_text(link)
+            article = self.cbs.get_article_text(link)
             summary = self.news.get_summary(article)
             get_summary = self.news.get_summary(summary)
             self.console.print(Panel(get_summary, expand=True, box=box.HEAVY2GE, title='Summary'), justify="center")
@@ -158,8 +176,8 @@ menu = Menu()
 # # menu.display_article_summary('Hello')
 # # menu.ascii_art()
 # # # menu.progress_bar()
-# menu.make_headlines_table(menu.get_headlines())
+menu.make_headlines_table()
 # menu.categories_panel()
 # menu.query_user()
-menu.get_user_input()
+# menu.get_user_input()
 # menu.display_category_news('Business')
