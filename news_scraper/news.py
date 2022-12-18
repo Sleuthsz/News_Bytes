@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-
+import bbc
 
 class News:
     def __init__(self):
@@ -27,6 +27,7 @@ class News:
 
     def get_summary(self, text):
         prompt = f"{text}\n\nTl;dr"
+        openai.api_key = self.api_key
         response = openai.Completion.create(
             model=self.ai_model['ada'],
             prompt=prompt,
@@ -37,3 +38,10 @@ class News:
             presence_penalty=1
         )
         return response["choices"][0]["text"]
+
+
+if __name__ == '__main__':
+    news = News()
+    bbc_news = bbc.BBC()
+    article = bbc_news.get_article_text('https://www.bbc.com/news/world-europe-64013052')
+    print(news.get_summary(article))
