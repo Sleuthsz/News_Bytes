@@ -12,6 +12,7 @@ from rich.table import Column
 from rich.prompt import Prompt, Confirm
 import pyfiglet
 import sys
+import os
 from rich import box
 
 import bbc, guardian, cbs, reuters, news
@@ -47,6 +48,15 @@ class Menu:
         for _ in track(lst, description="[green], fetching articles"):
             time.sleep(0.02)
 
+    @staticmethod
+    def clear_screen():
+        # Windows
+        if os.name == 'nt':
+            os.system('cls')
+        # Unix/Linux/MacOS
+        else:
+            os.system('clear')
+
 
     def make_headlines_table(self):
         headlines = self.get_headlines()
@@ -59,12 +69,6 @@ class Menu:
             table.add_row(str(index + 1),headline[0])
         self.console.print(table, justify="center")
 
-    @staticmethod
-    def check_index(number:int, numbers_list:list[int]):
-        if number in numbers_list:
-            return numbers_list.index(number)
-        return False
-
     def categories_panel(self):
         news_list:list[str] = ['[magenta]Business', '[blue]World News', '[magenta]Tech', '[blue]Sports']
         categories = [Panel(category, expand=True, box=box.HEAVY_EDGE) for category in news_list]
@@ -73,17 +77,23 @@ class Menu:
     def query_user(self):
         self.console.print(Panel('Enter a [red]category [white]if you wish to see more headlines,\n otherwise enter in a headline number in order to get a summary \n with a link to the article. If you wish to quit, enter (q)uit'), justify="center", style='Bold')
 
-    @staticmethod
-    # def get_user_input():
-    #     while True:
-    #         user_input = Prompt.ask("Select a category", choices=['Business', 'World News', 'Tech', 'Sports'])
-    #         if user_input.lower() == 'q' or user_input.lower() == 'quit':
-    #             if Confirm.ask("Are you sure you would like to quit?"):
-    #                 sys.exit()
-    #         for i in range(1, 11):
-    #             if user_input.lower() == str(i):
-
-
+    def get_user_input(self):
+        headlines = self.get_headlines()
+        while True:
+            user_input = input('> ')
+            if user_input.lower() == 'q' or user_input.lower() == 'quit':
+                if Confirm.ask("Are you sure you would like to quit?"):
+                    sys.exit()
+                continue
+            try:
+                index = int(user_input)
+                if 0 <= index < len(headlines):
+                    self.display_article_summary(headlines[index][1])
+                    break
+                else:
+                    print("Invalid input")
+            except ValueError:
+                print("Invalid input")
 
 
 
@@ -104,20 +114,26 @@ class Menu:
 
         if 'reuters' in link:
             article = self.reuters.get_article_text(link)
-            self.console.print(f'[u]{Panel(self.news.get_summary(article))}', justify="center")
+            summary = self.news.get_summary(article)
+            get_summary = self.news.get_summary(summary)
+            self.console.print(Panel(get_summary, expand=True, box=box.HEAVY_EDGE, title='Summary', highlight=True), justify="center")
         elif 'bbc' in link:
             article = self.bbc.get_article_text(link)
 
             summary = self.news.get_summary(article)
-            print(summary)
+            get_summary = self.news.get_summary(summary)
+            self.console.print(Panel(get_summary, box=box.HEAVY_EDGE, title='Summary', highlight=True, width=100), justify="center")
 
-            # self.console.print(f'[b]{Panel(summary)}')
         elif 'cbs' in link:
             article = self.cbsnews.get_article_text(link)
-            self.console.print(f'[c]{Panel(self.news.get_summary(article))}')
+            summary = self.news.get_summary(article)
+            get_summary = self.news.get_summary(summary)
+            self.console.print(Panel(get_summary, expand=True, box=box.HEAVY2GE, title='Summary'), justify="center")
         elif 'guardian' in link:
             article = self.guardian.get_article_text(link)
-            self.console.print(f'[c]{Panel(self.news.get_summary(article))}')
+            summary = self.news.get_summary(article)
+            get_summary = self.news.get_summary(summary)
+            self.console.print(Panel(get_summary, expand=True, box=box.HEAVY_EDGE, title='Summary', highlight=True), justify="center")
 
         self.console.print(Panel(link), justify="center")
 
@@ -136,7 +152,7 @@ class Menu:
 # inspect(Panel, methods=True)
 menu = Menu()
 # menu.main()
-menu.display_article_summary('https://www.bbc.com/news/world-europe-64013052')
+# menu.display_article_summary('https://www.bbc.com/news/world-europe-64013052')
 # # bbc_news = bbc.BBC()
 # menu.get_headlines()
 # # menu.display_article_summary('Hello')
@@ -145,5 +161,5 @@ menu.display_article_summary('https://www.bbc.com/news/world-europe-64013052')
 # menu.make_headlines_table(menu.get_headlines())
 # menu.categories_panel()
 # menu.query_user()
-# menu.get_user_input()
+menu.get_user_input()
 # menu.display_category_news('Business')
