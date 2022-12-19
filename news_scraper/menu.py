@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from functools import lru_cache
 from rich.console import Console
 from rich.table import Table
 from rich import print
@@ -28,6 +29,8 @@ class Menu:
         self.news = news.News()
         self.news_sources = [self.bbc, self.guardian, self.cbs, self.reuters]
 
+
+    @lru_cache(maxsize=None)
     def get_headlines(self, category):
         headlines = []
         with ThreadPoolExecutor() as executor:
@@ -61,8 +64,7 @@ class Menu:
             os.system('clear')
 
 
-    def make_headlines_table(self):
-        headlines = self.get_headlines('news')
+    def make_headlines_table(self, headlines):
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
@@ -110,7 +112,11 @@ class Menu:
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
+        if category == 'world news':
+            category.strip(' news')
+            table.add_column(f'{category.upper()} NEWS', justify="center")
         table.add_column(f'{category.upper()} NEWS', justify="center")
+
 
         for index, headline in enumerate(headlines):
             table.add_row(str(index + 1), headline[0])
@@ -133,7 +139,6 @@ class Menu:
         self.display_category_news(user_input, all_headlines[user_input])
 
     def display_category_menu(self, category, all_headlines):
-        #TODO: It's still not selecting the correct category. It selects the 1 + the displayed category
         # Called in the run_app method
         while True:
             #called method at 210
@@ -142,9 +147,9 @@ class Menu:
             if category_input.isnumeric():
                 #this iterates through the all_headlines dictionary lists at 250
                 for index, headline in enumerate(all_headlines[category]):
-                    if index == int(category_input):
+                    if index + 1 == int(category_input):
                         #checks the index of the specified list in the dictionary and sends the link which is attached to the key to display_article_summary
-                        all_headlines_dict_key = all_headlines[category][int(category_input)][1]
+                        all_headlines_dict_key = all_headlines[category][int(category_input) - 1][1]
                         self.display_article_summary(all_headlines_dict_key)
 
                 category_menu_input = input('> ')
@@ -153,16 +158,15 @@ class Menu:
                 elif category_menu_input.lower() == 'q' or category_menu_input.lower() == 'quit':
                     sys.exit()
 
-    def display_main_menu(self):
+    def display_main_menu(self, headlines):
         #called in the run_app method
         self.clear_screen()
-        self.make_headlines_table()
+        self.make_headlines_table(headlines)
         self.categories_panel()
         self.query_user()
 
     def run_app(self):
         categories = ["business", "world news", "tech", "sports"]
-        headlines = self.get_headlines("news")
         all_headlines = {
             "business": None,
             "world news": None,
@@ -170,7 +174,8 @@ class Menu:
             "sports": None
         }
         while True:
-            self.display_main_menu()
+            headlines = self.get_headlines("news")
+            self.display_main_menu(headlines)
             user_input = input('> ')
             if user_input.lower() == 'q' or user_input.lower() == 'quit':
                 if Confirm.ask("Are you sure you would like to quit?"):
@@ -181,7 +186,7 @@ class Menu:
                 continue
             elif user_input.isnumeric():
                 self.clear_screen()
-                for index, headline in enumerate(headlines):
+                for index , headline in enumerate(headlines):
                     if index + 1 == int(user_input):
                         self.display_article_summary(headline[1])
                 headline_input = input('> ')
