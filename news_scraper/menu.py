@@ -118,24 +118,57 @@ class Menu:
                     sports_headlines += future.result()[:2]
         return sports_headlines
 
-    def get_category_headlines(self, user_input, all_headlines):
-        match user_input.lower():
-            case "business":
-                if all_headlines["business"] is None:
-                    all_headlines["business"] = self.get_business_headlines()
-                self.display_category_news(all_headlines["business"])
-            case "world news":
-                if all_headlines["world_news"] is None:
-                    all_headlines["world_news"] = self.get_world_news_headlines()
-                self.display_category_news(all_headlines["world_news"])
-            case "tech":
-                if all_headlines["tech"] is None:
-                    all_headlines["tech"] = self.get_tech_headlines()
-                self.display_category_news(all_headlines["tech"])
-            case "sports":
-                if all_headlines["sports"] is None:
-                    all_headlines["sports"] = self.get_sport_headlines()
-                self.display_category_news(all_headlines["sports"])
+    def get_category_headlines(self, user_input, all_headlines, categories):
+        show_categories_headlines = True
+        while show_categories_headlines:
+            match user_input.lower():
+                case "business":
+                    if all_headlines["business"] is None:
+                        all_headlines["business"] = self.get_business_headlines()
+                    self.display_category_news(all_headlines["business"])
+                case "world news":
+                    if all_headlines["world_news"] is None:
+                        all_headlines["world_news"] = self.get_world_news_headlines()
+                    self.display_category_news(all_headlines["world_news"])
+                case "tech":
+                    if all_headlines["tech"] is None:
+                        all_headlines["tech"] = self.get_tech_headlines()
+                    self.display_category_news(all_headlines["tech"])
+                case "sports":
+                    if all_headlines["sports"] is None:
+                        all_headlines["sports"] = self.get_sport_headlines()
+                    self.display_category_news(all_headlines["sports"])
+            self.categories_panel()
+            self.query_user()
+            numeric_input = input("> ")
+            if numeric_input.isnumeric():
+                match user_input.lower():
+                    case "business":
+                        for i, headline in enumerate(all_headlines["business"]):
+                            if i == int(numeric_input):
+                                self.display_article_summary(headline[1])
+                            else:
+                                print("Invalid input")
+                    case "world news":
+                        for i, headline in enumerate(all_headlines["world_news"]):
+                            if i == int(numeric_input):
+                                self.display_article_summary(headline[1])
+                            else:
+                                print("Invalid input")
+                    case "tech":
+                        for i, headline in enumerate(all_headlines["tech"]):
+                            if i == int(numeric_input):
+                                self.display_article_summary(headline[1])
+                            else:
+                                print("Invalid input")
+                    case "sports":
+                        for i, headline in enumerate(all_headlines["sports"]):
+                            if i == int(numeric_input):
+                                self.display_article_summary(headline[1])
+                            else:
+                                print("Invalid input")
+            else:
+                show_categories_headlines = False
 
     def ascii_art(self):
         self.console.print(pyfiglet.figlet_format("WELCOME TO\n NEWS BYTES", font="slant", width=200), justify="center")
@@ -232,12 +265,13 @@ class Menu:
             elif user_input.lower() == 'r' or user_input.lower() == 'return':
                 continue
             elif user_input.lower() in categories:
-                self.get_category_headlines(user_input.lower(), all_headlines)
+                self.get_category_headlines(user_input.lower(), all_headlines, categories)
             elif user_input.isnumeric():
                 for i, headline in enumerate(headlines):
                     if i == int(user_input):
                         self.display_article_summary(headline[1])
-                    print("Invalid input")
+                    else:
+                        print("Invalid input")
 
 
     def main(self):
