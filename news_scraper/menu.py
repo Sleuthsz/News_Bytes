@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from rich.console import Console
 from rich.table import Table
 from rich import print
@@ -26,116 +26,27 @@ class Menu:
         self.cbs = cbs.CBS()
         self.reuters = reuters.Reuters()
         self.news = news.News()
+        self.news_sources = [self.bbc, self.guardian, self.cbs, self.reuters]
 
+    def get_headlines(self, category):
+        headlines = []
+        with ThreadPoolExecutor() as executor:
+            for source in self.news_sources:
+                if category == "news":
+                    future = executor.submit(source.get_news_headlines)
+                elif category == "business":
+                    future = executor.submit(source.get_business_headlines)
+                elif category == "world news":
+                    future = executor.submit(source.get_world_news_headlines)
+                elif category == "tech":
+                    future = executor.submit(source.get_tech_headlines)
+                elif category == "sports":
+                    future = executor.submit(source.get_sports_headlines)
+                else:
+                    raise ValueError(f'Invalid category: {category}, please enter a valid category')
+                headlines += future.result()[:2]
+        return headlines
 
-    def get_headlines(self):
-        new_list = []
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            for i in range(4):
-                if i == 0:
-                    future = executor.submit(self.bbc.get_news_headlines)
-                    new_list += future.result()[:2]
-                if i == 1:
-                    future = executor.submit(self.guardian.get_news_headlines)
-                    new_list += future.result()[:2]
-                if i == 2:
-                    future = executor.submit(self.cbs.get_news_headlines)
-                    new_list += future.result()[:2]
-                if i == 3:
-                    future = executor.submit(self.reuters.get_news_headlines)
-                    new_list += future.result()[:2]
-        return new_list
-
-    def get_business_headlines(self):
-        business_headlines = []
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            for i in range(4):
-                if i == 0:
-                    future = executor.submit(self.bbc.get_business_headlines)
-                    business_headlines += future.result()[:2]
-                if i == 1:
-                    future = executor.submit(self.guardian.get_business_headlines)
-                    business_headlines += future.result()[:2]
-                if i == 2:
-                    future = executor.submit(self.cbs.get_business_headlines)
-                    business_headlines += future.result()[:2]
-                if i == 3:
-                    future = executor.submit(self.reuters.get_business_headlines)
-                    business_headlines += future.result()[:2]
-        return business_headlines
-
-    def get_world_news_headlines(self):
-        world_news_headlines = []
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            for i in range(4):
-                if i == 0:
-                    future = executor.submit(self.bbc.get_world_news_headlines)
-                    world_news_headlines += future.result()[:2]
-                if i == 1:
-                    future = executor.submit(self.guardian.get_world_news_headlines)
-                    world_news_headlines += future.result()[:2]
-                if i == 2:
-                    future = executor.submit(self.cbs.get_world_news_headlines)
-                    world_news_headlines += future.result()[:2]
-                if i == 3:
-                    future = executor.submit(self.reuters.get_world_news_headlines)
-                    world_news_headlines += future.result()[:2]
-        return world_news_headlines
-
-    def get_tech_headlines(self):
-        tech_headlines = []
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            for i in range(4):
-                if i == 0:
-                    future = executor.submit(self.bbc.get_tech_headlines)
-                    tech_headlines += future.result()[:2]
-                if i == 1:
-                    future = executor.submit(self.guardian.get_tech_headlines)
-                    tech_headlines += future.result()[:2]
-                if i == 2:
-                    future = executor.submit(self.cbs.get_tech_headlines)
-                    tech_headlines += future.result()[:2]
-                if i == 3:
-                    future = executor.submit(self.reuters.get_tech_headlines)
-                    tech_headlines += future.result()[:2]
-        return tech_headlines
-
-    def get_sport_headlines(self):
-        sports_headlines = []
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            for i in range(4):
-                if i == 0:
-                    future = executor.submit(self.bbc.get_sports_headlines)
-                    sports_headlines += future.result()[:2]
-                if i == 1:
-                    future = executor.submit(self.guardian.get_sports_headlines)
-                    sports_headlines += future.result()[:2]
-                if i == 2:
-                    future = executor.submit(self.cbs.get_sports_headlines)
-                    sports_headlines += future.result()[:2]
-                if i == 3:
-                    future = executor.submit(self.reuters.get_sports_headlines)
-                    sports_headlines += future.result()[:2]
-        return sports_headlines
-
-    def get_category_headlines(self, user_input, all_headlines):
-        match user_input.lower():
-            case "business":
-                if all_headlines["business"] is None:
-                    all_headlines["business"] = self.get_business_headlines()
-                self.display_category_news(all_headlines["business"])
-            case "world news":
-                if all_headlines["world_news"] is None:
-                    all_headlines["world_news"] = self.get_world_news_headlines()
-                self.display_category_news(all_headlines["world_news"])
-            case "tech":
-                if all_headlines["tech"] is None:
-                    all_headlines["tech"] = self.get_tech_headlines()
-                self.display_category_news(all_headlines["tech"])
-            case "sports":
-                if all_headlines["sports"] is None:
-                    all_headlines["sports"] = self.get_sport_headlines()
-                self.display_category_news(all_headlines["sports"])
 
     def ascii_art(self):
         self.console.print(pyfiglet.figlet_format("WELCOME TO\n NEWS BYTES", font="slant", width=200), justify="center")
@@ -151,7 +62,7 @@ class Menu:
 
 
     def make_headlines_table(self):
-        headlines = self.get_headlines()
+        headlines = self.get_headlines('news')
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
@@ -170,90 +81,135 @@ class Menu:
         self.console.print(Panel('Enter a [red]category [white]if you wish to see more headlines,\n otherwise enter in a headline number in order to get a summary \n with a link to the article. If you wish to quit, enter (q)uit'), justify="center", style='Bold')
 
 
-    def display_category_news(self, headlines: list[str]):
+    def display_article_summary(self, link):
+        """
+        Checks if the news string is in the link parameter, if it is then it runs the sub function on it.
+        It then prints the link for the source article, and then prints out a menu
+        """
+        def fetch_and_display_summary(source):
+            # Sub function which calls get_article_text, get_summary on the source parameter
+            article = source.get_article_text(link)
+            get_summary = self.news.get_summary(article)
+            self.console.print(Panel(get_summary, expand=True, box=box.HEAVY_EDGE, title='Summary', highlight=True),
+                               justify="center")
+
+        if 'reuters' in link:
+            fetch_and_display_summary(self.reuters)
+        elif 'bbc' in link:
+            fetch_and_display_summary(self.bbc)
+        elif 'cbs' in link:
+            fetch_and_display_summary(self.cbs)
+        elif 'guardian' in link:
+            fetch_and_display_summary(self.guardian)
+
+        self.console.print(Panel(link), justify="center")
+
+        self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
+
+    def display_category_news(self,category, headlines: list[str]):
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
-        table.add_column('news_scraper', justify="center")
+        table.add_column(f'{category.upper()} NEWS', justify="center")
 
         for index, headline in enumerate(headlines):
             table.add_row(str(index + 1), headline[0])
 
         self.console.print(table, justify="center")
 
+    def get_category_headlines(self, user_input, all_headlines):
+        """
+        Grabs headlines based on user input and uses all_headlines which is reassigned to a dictionary
+        and calls the get_headlines method based on the user input
+        """
+        category_methods = {
+            "business": self.get_headlines(user_input),
+            "world news": self.get_headlines(user_input),
+            "tech": self.get_headlines(user_input),
+            "sports": self.get_headlines(user_input)
+        }
 
-    def display_article_summary(self,link):
+        all_headlines[user_input] = category_methods[user_input]
+        self.display_category_news(user_input, all_headlines[user_input])
 
-        if 'reuters' in link:
-            article = self.reuters.get_article_text(link)
-            summary = self.news.get_summary(article)
-            get_summary = self.news.get_summary(summary)
-            self.console.print(Panel(get_summary, expand=True, box=box.HEAVY_EDGE, title='Summary', highlight=True), justify="center")
-        elif 'bbc' in link:
-            article = self.bbc.get_article_text(link)
+    def display_category_menu(self, category, all_headlines):
+        #TODO: It's still not selecting the correct category. It selects the 1 + the displayed category
+        # Called in the run_app method
+        while True:
+            #called method at 210
+            self.get_category_headlines(category, all_headlines)
+            category_input = input()
+            if category_input.isnumeric():
+                #this iterates through the all_headlines dictionary lists at 250
+                for index, headline in enumerate(all_headlines[category]):
+                    if index == int(category_input):
+                        #checks the index of the specified list in the dictionary and sends the link which is attached to the key to display_article_summary
+                        all_headlines_dict_key = all_headlines[category][int(category_input)][1]
+                        self.display_article_summary(all_headlines_dict_key)
 
-            summary = self.news.get_summary(article)
-            get_summary = self.news.get_summary(summary)
-            self.console.print(Panel(get_summary, box=box.HEAVY_EDGE, title='Summary', highlight=True, width=100), justify="center")
+                category_menu_input = input('> ')
+                if category_menu_input.lower() == 'r' or category_menu_input.lower() == 'return':
+                    break
+                elif category_menu_input.lower() == 'q' or category_menu_input.lower() == 'quit':
+                    sys.exit()
 
-        elif 'cbs' in link:
-            article = self.cbs.get_article_text(link)
-            summary = self.news.get_summary(article)
-            get_summary = self.news.get_summary(summary)
-            self.console.print(Panel(get_summary, expand=True, box=box.HEAVY2GE, title='Summary'), justify="center")
-        elif 'guardian' in link:
-            article = self.guardian.get_article_text(link)
-            summary = self.news.get_summary(article)
-            get_summary = self.news.get_summary(summary)
-            self.console.print(Panel(get_summary, expand=True, box=box.HEAVY_EDGE, title='Summary', highlight=True), justify="center")
+    def display_main_menu(self):
+        #called in the run_app method
+        self.clear_screen()
+        self.make_headlines_table()
+        self.categories_panel()
+        self.query_user()
 
-        self.console.print(Panel(link), justify="center")
-
-        self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
-
-    def get_user_input(self):
+    def run_app(self):
         categories = ["business", "world news", "tech", "sports"]
-        headlines = self.get_headlines()
+        headlines = self.get_headlines("news")
         all_headlines = {
             "business": None,
-            "world_news": None,
+            "world news": None,
             "tech": None,
             "sports": None
         }
         while True:
-            self.make_headlines_table()
-            self.categories_panel()
-            self.query_user()
+            self.display_main_menu()
             user_input = input('> ')
             if user_input.lower() == 'q' or user_input.lower() == 'quit':
                 if Confirm.ask("Are you sure you would like to quit?"):
                     sys.exit()
-                continue
+                else:
+                    continue
             elif user_input.lower() == 'r' or user_input.lower() == 'return':
                 continue
-            elif user_input.lower() in categories:
-                self.get_category_headlines(user_input.lower(), all_headlines)
             elif user_input.isnumeric():
-                for i, headline in enumerate(headlines):
-                    if i == int(user_input):
+                self.clear_screen()
+                for index, headline in enumerate(headlines):
+                    if index + 1 == int(user_input):
                         self.display_article_summary(headline[1])
-                    print("Invalid input")
+                headline_input = input('> ')
+                if headline_input.lower() == 'r' or headline_input.lower() == 'return':
+                    continue
+                if headline_input.lower() == 'q' or headline_input.lower() == 'quit':
+                    sys.exit()
+                else:
+                    console.print(Panel(f'[red]Sorry, that is not a valid input'), justify='center')
+            elif user_input.lower() in categories:
+                self.display_category_menu(user_input.lower(), all_headlines)
+            else:
+                console.print(Panel(f'Sorry, that is not a valid input'),justify='center')
 
 
     def main(self):
+        self.clear_screen()
         self.ascii_art()
-        self.get_user_input()
+        self.run_app()
 
 
 
 # inspect('', methods=True)
 # inspect(Panel, methods=True)
 menu = Menu()
-# print(menu.get_headlines())
 menu.main()
 # menu.display_article_summary('https://www.bbc.com/news/world-europe-64013052')
 # # bbc_news = bbc.BBC()
-# menu.get_headlines()
 # # menu.display_article_summary('Hello')
 # # menu.ascii_art()
 # # # menu.progress_bar()
