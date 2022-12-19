@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-
 from rich.console import Console
 from rich.table import Table
 from rich import print
@@ -16,8 +15,6 @@ import pyfiglet
 import sys
 import os
 from rich import box
-
-
 import bbc, guardian, cbs, reuters, news
 
 
@@ -31,16 +28,8 @@ class Menu:
         self.news = news.News()
 
 
-
     def get_headlines(self):
         new_list = []
-        start_time = time.time()
-        # bbc_news = self.bbc.get_news_headlines()
-        # guardian_news = self.guardian.get_news_headlines()
-        # cbs_news = self.cbs.get_news_headlines()
-        # reuters_news = self.reuters.get_news_headlines()
-        #
-        # new_list += bbc_news[0:2] + guardian_news[0:2] + cbs_news[0:2] + reuters_news[0:2]
         with ThreadPoolExecutor(max_workers=4) as executor:
             for i in range(4):
                 if i == 0:
@@ -55,16 +44,10 @@ class Menu:
                 if i == 3:
                     future = executor.submit(self.reuters.get_news_headlines)
                     new_list += future.result()[:2]
-        print(f"Time Elapsed: {time.time() - start_time}")
         return new_list
 
     def ascii_art(self):
         self.console.print(pyfiglet.figlet_format("WELCOME TO\n NEWS BYTES", font="slant", width=200), justify="center")
-
-    @staticmethod
-    def progress_bar(lst:list):
-        for _ in track(lst, description="[green], fetching articles"):
-            time.sleep(0.02)
 
     @staticmethod
     def clear_screen():
@@ -94,26 +77,6 @@ class Menu:
 
     def query_user(self):
         self.console.print(Panel('Enter a [red]category [white]if you wish to see more headlines,\n otherwise enter in a headline number in order to get a summary \n with a link to the article. If you wish to quit, enter (q)uit'), justify="center", style='Bold')
-
-    def get_user_input(self):
-        headlines = self.get_headlines()
-        while True:
-            user_input = input('> ')
-            if user_input.lower() == 'q' or user_input.lower() == 'quit':
-                if Confirm.ask("Are you sure you would like to quit?"):
-                    sys.exit()
-                continue
-            try:
-                index = int(user_input)
-                if 0 <= index < len(headlines):
-                    self.display_article_summary(headlines[index][1])
-                    break
-                else:
-                    print("Invalid input")
-            except ValueError:
-                print("Invalid input")
-
-
 
 
     def display_category_news(self, category:str, headlines: list[str]):
@@ -157,11 +120,29 @@ class Menu:
 
         self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
 
+    def get_user_input(self):
+        headlines = self.get_headlines()
+        while True:
+            self.make_headlines_table()
+            self.categories_panel()
+            self.query_user()
+            user_input = input('> ')
+            if user_input.lower() == 'q' or user_input.lower() == 'quit':
+                if Confirm.ask("Are you sure you would like to quit?"):
+                    sys.exit()
+                continue
+            elif user_input.lower() == 'r' or user_input.lower() == 'return':
+                continue
+            for i, headline in enumerate(headlines):
+                if i == int(user_input):
+                    self.display_article_summary(headline[1])
+                print("Invalid input")
+
+
     def main(self):
         self.ascii_art()
-        self.make_headlines_table()
-        self.categories_panel()
-        self.query_user()
+        self.get_user_input()
+
 
 
 
@@ -169,14 +150,15 @@ class Menu:
 # inspect('', methods=True)
 # inspect(Panel, methods=True)
 menu = Menu()
-# menu.main()
+# print(menu.get_headlines())
+menu.main()
 # menu.display_article_summary('https://www.bbc.com/news/world-europe-64013052')
 # # bbc_news = bbc.BBC()
 # menu.get_headlines()
 # # menu.display_article_summary('Hello')
 # # menu.ascii_art()
 # # # menu.progress_bar()
-menu.make_headlines_table()
+# menu.make_headlines_table()
 # menu.categories_panel()
 # menu.query_user()
 # menu.get_user_input()
