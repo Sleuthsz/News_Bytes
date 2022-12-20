@@ -1,47 +1,11 @@
-import os
-import openai
-from dotenv import load_dotenv
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
-
-class News:
-    def __init__(self):
-        self.title = ""
-        self.env = load_dotenv()
-        self.api_key = os.getenv("OPENAI_API_KEY")
-        self.options = Options()
-        self.options.headless = True
-        self.homedir = os.path.expanduser("~")
-        self.webdriver_service = Service(f"{self.homedir}/chromedriver/stable/chromedriver")
-        self.driver = webdriver.Chrome(options=self.options, service=self.webdriver_service)
-        self.ai_model = {
-            'ada': "text-ada-001",
-            'babbage': "text-babbage-001",
-            'curie': "text-curie-001",
-            'davinci': "text-davinci-001",
-        }
-
-    def get_summary(self, text):
-        prompt = f"{text}\n\nTl;dr"
-        response = openai.Completion.create(
-            model=self.ai_model['ada'],
-            prompt=prompt,
-            temperature=0.7,
-            max_tokens=140,
-            top_p=1.0,
-            frequency_penalty=0.0,
-            presence_penalty=1
-        )
-        return response["choices"][0]["text"]
+import news
 
 
-class BBC(News):
+class BBC(news.News):
     def __init__(self):
         super().__init__()
-        self.driver.implicitly_wait(1)
 
     def get_news_headlines(self):
         self.driver.get("https://www.bbc.com")
@@ -61,7 +25,7 @@ class BBC(News):
             if link is not None:
                 head = element.find_element(By.TAG_NAME, 'h3').text
 
-            if head is not '' and link is not None:
+            if head != '' and link is not None:
                 headlines_links.append((head, link))
 
         return headlines_links[0:10]
@@ -85,7 +49,7 @@ class BBC(News):
             if link is not None:
                 head = element.find_element(By.TAG_NAME, 'p').text
 
-            if head is not '' and link is not None:
+            if head != '' and link is not None:
                 headlines_links.append((head, link))
 
         return headlines_links[0:10]

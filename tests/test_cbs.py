@@ -1,25 +1,11 @@
-import os
-
 import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 
-from news.scrape_cbs import CBSNewsScraper
+from news_scraper.cbs import CBS
 
 
 @pytest.fixture
 def setup():
-    homedir = os.path.expanduser("~")
-    webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
-
-    options = Options()
-    options.headless = True
-
-    driver = webdriver.Chrome(options=options, service=webdriver_service)
-    driver.implicitly_wait(1)
-
-    cbs_scraper = CBSNewsScraper(driver, options)
+    cbs_scraper = CBS()
     return cbs_scraper
 
 
@@ -39,7 +25,7 @@ def test_get_world_news_headlines(setup):
 
 
 def test_get_tech_news_headlines(setup):
-    tech_headlines_and_links = setup.get_tech_news_headlines()
+    tech_headlines_and_links = setup.get_tech_headlines()
     assert len(tech_headlines_and_links) > 0
 
 
@@ -67,7 +53,7 @@ def test_get_world_news_article_text(setup):
 
 
 def test_get_tech_news_article_text(setup):
-    tech_headlines_and_links = setup.get_tech_news_headlines()
+    tech_headlines_and_links = setup.get_tech_headlines()
     tech_article_text = setup.get_article_text(tech_headlines_and_links[0][1])
     assert len(tech_article_text) > 0
 
