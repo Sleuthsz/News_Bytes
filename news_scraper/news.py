@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import bbc
 
+
 class News:
     def __init__(self):
         self.title = ""

@@ -69,16 +69,8 @@ class BBC(news.News):
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    links = get_headlines()
-    article_text = get_article_text(links[1][1])
-    summary = get_summary(article_text)
-    print(summary)
-    print(article_text)
-=======
     bbc = BBC()
-    #print(bbc.get_tech_headlines())
-    #print(bbc.get_sports_headlines())
-    #print(bbc.get_article_text('https://www.bbc.com/news/business-64010202'))
+    # print(bbc.get_tech_headlines())
+    # print(bbc.get_sports_headlines())
+    # print(bbc.get_article_text('https://www.bbc.com/news/business-64010202'))
     print(bbc.get_article_text('https://www.bbc.com/sport/football/63926145'))
->>>>>>> 4c685db6ac77473fe972fd260f2239aec863c076
