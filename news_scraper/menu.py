@@ -112,10 +112,10 @@ class Menu:
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
-        if category == 'world news':
-            category.strip(' news')
+        if category.lower() == 'world news':
+            table.add_column('WORLD NEWS', justify="center")
+        else:
             table.add_column(f'{category.upper()} NEWS', justify="center")
-        table.add_column(f'{category.upper()} NEWS', justify="center")
 
 
         for index, headline in enumerate(headlines):
@@ -143,7 +143,11 @@ class Menu:
         while True:
             #called method at 210
             self.get_category_headlines(category, all_headlines)
-            category_input = input()
+            category_input = input('> ')
+            if category_input.lower() == 'r' or category_input.lower() == 'return':
+                break
+            elif category_input.lower() == 'q' or category_input.lower() == 'quit':
+                sys.exit()
             if category_input.isnumeric():
                 #this iterates through the all_headlines dictionary lists at 250
                 for index, headline in enumerate(all_headlines[category]):
@@ -157,6 +161,8 @@ class Menu:
                     break
                 elif category_menu_input.lower() == 'q' or category_menu_input.lower() == 'quit':
                     sys.exit()
+
+        self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
 
     def display_main_menu(self, headlines):
         #called in the run_app method
@@ -198,8 +204,13 @@ class Menu:
                     console.print(Panel(f'[red]Sorry, that is not a valid input'), justify='center')
             elif user_input.lower() in categories:
                 self.display_category_menu(user_input.lower(), all_headlines)
+                if user_input.lower() == 'r' or user_input.lower() == 'return':
+                    break
+                elif user_input.lower() == 'q' or user_input.lower() == 'quit':
+                    sys.exit()
+
             else:
-                console.print(Panel(f'Sorry, that is not a valid input'),justify='center')
+                self.console.print(Panel(f'Sorry, that is not a valid input'),justify='center')
 
 
     def main(self):
