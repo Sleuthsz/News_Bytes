@@ -34,23 +34,28 @@ class Menu:
     @lru_cache(maxsize=None)
     def get_headlines(self, category):
         headlines = []
-        with ThreadPoolExecutor() as executor:
-            for source in self.news_sources:
-                if category == "news":
-                    future = executor.submit(source.get_news_headlines)
-                elif category == "business":
-                    future = executor.submit(source.get_business_headlines)
-                elif category == "world news":
-                    future = executor.submit(source.get_world_news_headlines)
-                elif category == "tech":
-                    future = executor.submit(source.get_tech_headlines)
-                elif category == "sports":
-                    future = executor.submit(source.get_sports_headlines)
-                elif category == "local news":
-                    continue
-                else:
-                    raise ValueError(f'Invalid category: {category}, please enter a valid category')
-                headlines += future.result()[:2]
+        if category == "news" or category == "world news":
+            text = category
+        else:
+            text = f"{category} news"
+        with self.console.status(f"Getting {text}...", spinner="shark"):
+            with ThreadPoolExecutor() as executor:
+                for source in self.news_sources:
+                    if category == "news":
+                        future = executor.submit(source.get_news_headlines)
+                    elif category == "business":
+                        future = executor.submit(source.get_business_headlines)
+                    elif category == "world news":
+                        future = executor.submit(source.get_world_news_headlines)
+                    elif category == "tech":
+                        future = executor.submit(source.get_tech_headlines)
+                    elif category == "sports":
+                        future = executor.submit(source.get_sports_headlines)
+                    elif category == "local news":
+                        continue
+                    else:
+                        raise ValueError(f'Invalid category: {category}, please enter a valid category')
+                    headlines += future.result()[:2]
         return headlines
 
 
@@ -178,7 +183,8 @@ class Menu:
         self.query_user()
 
     def display_local_news(self, city):
-        local_news = self.axios.get_local_news(city)
+        with self.console.status(f"Getting local news from {city}...", spinner="shark"):
+            local_news = self.axios.get_local_news(city)
 
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE,
                       highlight=True)
