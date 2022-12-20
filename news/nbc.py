@@ -73,8 +73,8 @@ class NBC:
             try:
                 head = element.find_element(By.TAG_NAME, 'h2').text
             except:
+                business_headlines_links.append((head, link))
                 continue
-            business_headlines_links.append((head, link))
         return business_headlines_links[0:10]
 
     def get_world_news_headlines(self):
@@ -128,13 +128,13 @@ if __name__ == "__main__":
     nbc = NBC()
     # working
     headlines = nbc.get_news_headlines()
-    print(headlines)
+    # print(headlines)
     business = nbc.get_business_headlines()
-    print(business)
+    # print(business)
     world = nbc.get_world_news_headlines()
-    print(world)
+    # print(world)
     sports = nbc.get_sports_headlines()
-    print(sports)
+    # print(sports)
 
     # not working
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
     # almost working
     tech = nbc.get_tech_headlines()
-    print(tech)
+    # print(tech)
 
     # ------------------unused until able to get rest working-------------
     # article_text = get_article_text(links[1][1])
