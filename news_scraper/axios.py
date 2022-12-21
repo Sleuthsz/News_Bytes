@@ -2,18 +2,13 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+import news
 import os
 
 
-class Axios:
-
-    options = Options()
-    options.headless = True
-
-    homedir = os.path.expanduser("~")
-    webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
-
-    driver = webdriver.Chrome(options=options, service=webdriver_service)
+class Axios(news.News):
+    def __init__(self):
+        super().__init__()
 
     local_cities = ['atlanta', 'austin', 'boston', 'charlotte', 'chicago', 'columbus', 'dallas', 'denver', 'des moines',
                     'detroit', 'houston', 'miami', 'nashville', 'nw arkansas', 'philadelphia', 'phoenix', 'raleigh',
@@ -55,7 +50,3 @@ class Axios:
         return article
 
 
-if __name__ == "__main__":
-    axios = Axios()
-    #print(axios.get_local_news('Washington DC'))
-    print(axios.get_article_text('https://www.axios.com/local/seattle/2022/12/15/supernatural-places-seattle'))

@@ -23,14 +23,14 @@ class News:
             'ada': "text-ada-001",
             'babbage': "text-babbage-001",
             'curie': "text-curie-001",
-            'davinci': "text-davinci-001",
+            'davinci': "text-davinci-003",
         }
 
     def get_summary(self, text):
         prompt = f"{text}\n\nTl;dr"
         openai.api_key = self.api_key
         response = openai.Completion.create(
-            model=self.ai_model['ada'],
+            model=self.ai_model['davinci'],
             prompt=prompt,
             temperature=0.7,
             max_tokens=140,
@@ -41,8 +41,4 @@ class News:
         return response["choices"][0]["text"]
 
 
-if __name__ == '__main__':
-    news = News()
-    bbc_news = bbc.BBC()
-    article = bbc_news.get_article_text('https://www.bbc.com/news/world-europe-64013052')
-    print(news.get_summary(article))
+

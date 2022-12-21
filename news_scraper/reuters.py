@@ -47,8 +47,3 @@ class Reuters(news.News):
         return text
 
 
-if __name__ == "__main__":
-    reuters = Reuters()
-    print(reuters.get_news_headlines())
-    tech_headlines = reuters.get_tech_headlines()
-    print(reuters.get_article_text(tech_headlines[0][1]))

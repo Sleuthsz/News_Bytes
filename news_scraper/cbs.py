@@ -102,12 +102,3 @@ class CBS(news.News):
                 text += paragraph_element.text
             return text
 
-
-if __name__ == '__main__':
-    cbs_scraper = CBS()
-
-    articles = cbs_scraper.get_sports_headlines()
-    for article in articles:
-        print(cbs_scraper.get_article_text(article[1]))
-        print(">>>>>>>>>>>>>>>>")
-        # print(article[1])
