@@ -16,7 +16,7 @@ import pyfiglet
 import sys
 import os
 from rich import box
-import bbc, guardian, cbs, reuters, news
+import bbc, guardian, cbs, reuters, news, axios
 
 
 class Menu:
@@ -26,28 +26,37 @@ class Menu:
         self.guardian = guardian.Guardian()
         self.cbs = cbs.CBS()
         self.reuters = reuters.Reuters()
+        self.axios = axios.Axios()
         self.news = news.News()
         self.news_sources = [self.bbc, self.guardian, self.cbs, self.reuters]
 
 
     @lru_cache(maxsize=None)
     def get_headlines(self, category):
+
         headlines = []
-        with ThreadPoolExecutor() as executor:
-            for source in self.news_sources:
-                if category == "news":
-                    future = executor.submit(source.get_news_headlines)
-                elif category == "business":
-                    future = executor.submit(source.get_business_headlines)
-                elif category == "world news":
-                    future = executor.submit(source.get_world_news_headlines)
-                elif category == "tech":
-                    future = executor.submit(source.get_tech_headlines)
-                elif category == "sports":
-                    future = executor.submit(source.get_sports_headlines)
-                else:
-                    raise ValueError(f'Invalid category: {category}, please enter a valid category')
-                headlines += future.result()[:2]
+        if category == "news" or category == "world news":
+            text = category
+        else:
+            text = f"{category} news"
+        with self.console.status(f"Getting {text}...", spinner="shark"):
+            with ThreadPoolExecutor() as executor:
+                for source in self.news_sources:
+                    if category == "news":
+                        future = executor.submit(source.get_news_headlines)
+                    elif category == "business":
+                        future = executor.submit(source.get_business_headlines)
+                    elif category == "world news":
+                        future = executor.submit(source.get_world_news_headlines)
+                    elif category == "tech":
+                        future = executor.submit(source.get_tech_headlines)
+                    elif category == "sports":
+                        future = executor.submit(source.get_sports_headlines)
+                    elif category == "local news":
+                        continue
+                    else:
+                        raise ValueError(f'Invalid category: {category}, please enter a valid category')
+                    headlines += future.result()[:2]
         return headlines
 
 
@@ -75,7 +84,8 @@ class Menu:
         self.console.print(table, justify="center")
 
     def categories_panel(self):
-        news_list:list[str] = ['[magenta]Business', '[blue]World News', '[magenta]Tech', '[blue]Sports']
+        news_list:list[str] = ['[magenta]Business', '[blue]World News', '[magenta]Tech', '[blue]Sports',
+                               '[magenta]Local News']
         categories = [Panel(category, expand=True, box=box.HEAVY_EDGE) for category in news_list]
         self.console.print(Columns(categories), justify="center")
 
@@ -103,12 +113,14 @@ class Menu:
             fetch_and_display_summary(self.cbs)
         elif 'guardian' in link:
             fetch_and_display_summary(self.guardian)
+        elif 'axios' in link:
+            fetch_and_display_summary(self.axios)
 
         self.console.print(Panel(link), justify="center")
 
         self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
 
-    def display_category_news(self,category, headlines: list[str]):
+    def display_category_news(self, category, headlines):
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
@@ -116,7 +128,6 @@ class Menu:
             table.add_column('WORLD NEWS', justify="center")
         else:
             table.add_column(f'{category.upper()} NEWS', justify="center")
-
 
         for index, headline in enumerate(headlines):
             table.add_row(str(index + 1), headline[0])
@@ -132,13 +143,14 @@ class Menu:
             "business": self.get_headlines(user_input),
             "world news": self.get_headlines(user_input),
             "tech": self.get_headlines(user_input),
-            "sports": self.get_headlines(user_input)
+            "sports": self.get_headlines(user_input),
+            "local news": self.get_headlines(user_input)
         }
 
         all_headlines[user_input] = category_methods[user_input]
         self.display_category_news(user_input, all_headlines[user_input])
 
-    def display_category_menu(self, category, all_headlines):
+    def run_category_menu(self, category, all_headlines):
         # Called in the run_app method
         while True:
             #called method at 210
@@ -171,13 +183,58 @@ class Menu:
         self.categories_panel()
         self.query_user()
 
+    def display_local_news(self, city):
+        with self.console.status(f"Getting local news from {city}...", spinner="shark"):
+            local_news = self.axios.get_local_news(city)
+
+        table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE,
+                      highlight=True)
+
+        table.add_column("#", justify="center")
+        table.add_column("[i]Local News", justify="center", style="light_steel_blue", header_style="light_sky_blue1")
+
+        for index, headline in enumerate(local_news):
+            table.add_row(str(index + 1), headline[0])
+        self.console.print(table, justify="center")
+
+        return local_news
+
+    def run_local_news(self):
+        while True:
+            local_input = input('Enter city: ')
+            local_heads = self.display_local_news(local_input)
+
+            if local_input.lower() == 'r' or local_input.lower() == 'return':
+                break
+            if local_input.lower() == 'q' or local_input.lower() == 'quit':
+                sys.exit()
+
+            local_input2 = input('> ')
+            if local_input2.lower() == 'r' or local_input2.lower() == 'return':
+                break
+            if local_input2.lower() == 'q' or local_input2.lower() == 'quit':
+                sys.exit()
+
+            if local_input2.isnumeric():
+                self.clear_screen()
+                for index, headline in enumerate(local_heads):
+                    if index + 1 == int(local_input2):
+                        self.display_article_summary(headline[1])
+
+                local_input3 = input('>')
+
+                if local_input3.lower() == 'r' or local_input3.lower() == 'return':
+                    break
+                if local_input3.lower() == 'q' or local_input3.lower() == 'quit':
+                    sys.exit()
+
     def run_app(self):
-        categories = ["business", "world news", "tech", "sports"]
+        categories = ["business", "world news", "tech", "sports", "local news"]
         all_headlines = {
             "business": None,
             "world news": None,
             "tech": None,
-            "sports": None
+            "sports": None,
         }
         while True:
             headlines = self.get_headlines("news")
@@ -201,13 +258,16 @@ class Menu:
                 if headline_input.lower() == 'q' or headline_input.lower() == 'quit':
                     sys.exit()
                 else:
-                    console.print(Panel(f'[red]Sorry, that is not a valid input'), justify='center')
+                    self.console.print(Panel(f'[red]Sorry, that is not a valid input'), justify='center')
             elif user_input.lower() in categories:
-                self.display_category_menu(user_input.lower(), all_headlines)
-                if user_input.lower() == 'r' or user_input.lower() == 'return':
-                    break
-                elif user_input.lower() == 'q' or user_input.lower() == 'quit':
-                    sys.exit()
+                if user_input.lower() == 'local news':
+                    self.run_local_news()
+                else:
+                    self.run_category_menu(user_input.lower(), all_headlines)
+                    if user_input.lower() == 'r' or user_input.lower() == 'return':
+                        break
+                    elif user_input.lower() == 'q' or user_input.lower() == 'quit':
+                        sys.exit()
 
             else:
                 self.console.print(Panel(f'Sorry, that is not a valid input'),justify='center')

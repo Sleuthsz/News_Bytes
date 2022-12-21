@@ -50,7 +50,7 @@ class Axios:
 
         article = ''
         for par in pars:
-            print(par.text)
+            article += par.text
 
         return article
 
