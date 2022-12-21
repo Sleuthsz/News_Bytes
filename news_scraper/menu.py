@@ -16,19 +16,20 @@ import pyfiglet
 import sys
 import os
 from rich import box
-import bbc, guardian, cbs, reuters, news, axios
+import bbc, guardian, cbs, reuters, news, axios, nbc
 
 
 class Menu:
     def __init__(self):
         self.console = Console()
         self.bbc = bbc.BBC()
+        self.nbc = nbc.NBC()
         self.guardian = guardian.Guardian()
         self.cbs = cbs.CBS()
         self.reuters = reuters.Reuters()
         self.axios = axios.Axios()
         self.news = news.News()
-        self.news_sources = [self.bbc, self.guardian, self.cbs, self.reuters]
+        self.news_sources = [self.bbc, self.guardian, self.cbs, self.reuters, self.nbc]
 
 
     @lru_cache(maxsize=None)
@@ -57,6 +58,11 @@ class Menu:
                     else:
                         raise ValueError(f'Invalid category: {category}, please enter a valid category')
                     headlines += future.result()[:2]
+                self.news.driver.quit()
+                if self.news.driver.service.service_url:
+                    print("Webdriver is running at:", self.news.driver.service.service_url)
+                else:
+                    print("Webdriver is not running")
         return headlines
 
 
@@ -102,7 +108,7 @@ class Menu:
             # Sub function which calls get_article_text, get_summary on the source parameter
             article = source.get_article_text(link)
             get_summary = self.news.get_summary(article)
-            self.console.print(Panel(get_summary, expand=True, box=box.HEAVY_EDGE, title='Summary', highlight=True),
+            self.console.print(Panel(get_summary, width=100, box=box.HEAVY_EDGE, title='Summary', highlight=True),
                                justify="center")
 
         if 'reuters' in link:
@@ -115,8 +121,15 @@ class Menu:
             fetch_and_display_summary(self.guardian)
         elif 'axios' in link:
             fetch_and_display_summary(self.axios)
+        elif 'nbc' in link:
+            fetch_and_display_summary(self.nbc)
 
         self.console.print(Panel(link), justify="center")
+        self.news.driver.quit()
+        if self.news.driver.service.service_url:
+            print("Webdriver is running at:", self.news.driver.service.service_url)
+        else:
+            print("Webdriver is not running")
 
         self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
 
@@ -152,29 +165,33 @@ class Menu:
 
     def run_category_menu(self, category, all_headlines):
         # Called in the run_app method
-        while True:
-            #called method at 210
-            self.get_category_headlines(category, all_headlines)
-            category_input = input('> ')
-            if category_input.lower() == 'r' or category_input.lower() == 'return':
-                break
-            elif category_input.lower() == 'q' or category_input.lower() == 'quit':
-                sys.exit()
-            if category_input.isnumeric():
-                #this iterates through the all_headlines dictionary lists at 250
-                for index, headline in enumerate(all_headlines[category]):
-                    if index + 1 == int(category_input):
-                        #checks the index of the specified list in the dictionary and sends the link which is attached to the key to display_article_summary
-                        all_headlines_dict_key = all_headlines[category][int(category_input) - 1][1]
-                        self.display_article_summary(all_headlines_dict_key)
-
-                category_menu_input = input('> ')
-                if category_menu_input.lower() == 'r' or category_menu_input.lower() == 'return':
+        try:
+            while True:
+                #called method at 210
+                self.get_category_headlines(category, all_headlines)
+                category_input = input('> ')
+                if category_input.lower() == 'r' or category_input.lower() == 'return':
                     break
-                elif category_menu_input.lower() == 'q' or category_menu_input.lower() == 'quit':
+                elif category_input.lower() == 'q' or category_input.lower() == 'quit':
                     sys.exit()
+                if category_input.isnumeric():
+                    #this iterates through the all_headlines dictionary lists at 250
+                    for index, headline in enumerate(all_headlines[category]):
+                        if index + 1 == int(category_input):
+                            #checks the index of the specified list in the dictionary and sends the link which is attached to the key to display_article_summary
+                            all_headlines_dict_key = all_headlines[category][int(category_input) - 1][1]
+                            self.display_article_summary(all_headlines_dict_key)
 
-        self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
+                    category_menu_input = input('> ')
+                    if category_menu_input.lower() == 'r' or category_menu_input.lower() == 'return':
+                        break
+                    elif category_menu_input.lower() == 'q' or category_menu_input.lower() == 'quit':
+                        sys.exit()
+
+            self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
+        except KeyboardInterrupt as error:
+            self.news.driver.quit()
+            self.console.print(f'[red]{error}', justify='center')
 
     def display_main_menu(self, headlines):
         #called in the run_app method
@@ -200,33 +217,37 @@ class Menu:
         return local_news
 
     def run_local_news(self):
-        while True:
-            local_input = input('Enter city: ')
-            local_heads = self.display_local_news(local_input)
+        try:
+            while True:
+                local_input = input('Enter city: ')
+                local_heads = self.display_local_news(local_input)
 
-            if local_input.lower() == 'r' or local_input.lower() == 'return':
-                break
-            if local_input.lower() == 'q' or local_input.lower() == 'quit':
-                sys.exit()
-
-            local_input2 = input('> ')
-            if local_input2.lower() == 'r' or local_input2.lower() == 'return':
-                break
-            if local_input2.lower() == 'q' or local_input2.lower() == 'quit':
-                sys.exit()
-
-            if local_input2.isnumeric():
-                self.clear_screen()
-                for index, headline in enumerate(local_heads):
-                    if index + 1 == int(local_input2):
-                        self.display_article_summary(headline[1])
-
-                local_input3 = input('>')
-
-                if local_input3.lower() == 'r' or local_input3.lower() == 'return':
+                if local_input.lower() == 'r' or local_input.lower() == 'return':
                     break
-                if local_input3.lower() == 'q' or local_input3.lower() == 'quit':
+                if local_input.lower() == 'q' or local_input.lower() == 'quit':
                     sys.exit()
+
+                local_input2 = input('> ')
+                if local_input2.lower() == 'r' or local_input2.lower() == 'return':
+                    break
+                if local_input2.lower() == 'q' or local_input2.lower() == 'quit':
+                    sys.exit()
+
+                if local_input2.isnumeric():
+                    self.clear_screen()
+                    for index, headline in enumerate(local_heads):
+                        if index + 1 == int(local_input2):
+                            self.display_article_summary(headline[1])
+
+                    local_input3 = input('>')
+
+                    if local_input3.lower() == 'r' or local_input3.lower() == 'return':
+                        break
+                    if local_input3.lower() == 'q' or local_input3.lower() == 'quit':
+                        sys.exit()
+        except KeyboardInterrupt as error:
+            news.driver.quit()
+            self.console.print(f'[red]{error}', justify='center')
 
     def run_app(self):
         categories = ["business", "world news", "tech", "sports", "local news"]
@@ -236,41 +257,46 @@ class Menu:
             "tech": None,
             "sports": None,
         }
-        while True:
-            headlines = self.get_headlines("news")
-            self.display_main_menu(headlines)
-            user_input = input('> ')
-            if user_input.lower() == 'q' or user_input.lower() == 'quit':
-                if Confirm.ask("Are you sure you would like to quit?"):
-                    sys.exit()
-                else:
-                    continue
-            elif user_input.lower() == 'r' or user_input.lower() == 'return':
-                continue
-            elif user_input.isnumeric():
-                self.clear_screen()
-                for index , headline in enumerate(headlines):
-                    if index + 1 == int(user_input):
-                        self.display_article_summary(headline[1])
-                headline_input = input('> ')
-                if headline_input.lower() == 'r' or headline_input.lower() == 'return':
-                    continue
-                if headline_input.lower() == 'q' or headline_input.lower() == 'quit':
-                    sys.exit()
-                else:
-                    self.console.print(Panel(f'[red]Sorry, that is not a valid input'), justify='center')
-            elif user_input.lower() in categories:
-                if user_input.lower() == 'local news':
-                    self.run_local_news()
-                else:
-                    self.run_category_menu(user_input.lower(), all_headlines)
-                    if user_input.lower() == 'r' or user_input.lower() == 'return':
-                        break
-                    elif user_input.lower() == 'q' or user_input.lower() == 'quit':
+        try:
+            while True:
+                headlines = self.get_headlines("news")
+                self.display_main_menu(headlines)
+                user_input = input('> ')
+                if user_input.lower() == 'q' or user_input.lower() == 'quit':
+                    if Confirm.ask("Are you sure you would like to quit?"):
                         sys.exit()
+                    else:
+                        continue
+                elif user_input.lower() == 'r' or user_input.lower() == 'return':
+                    continue
+                elif user_input.isnumeric():
+                    self.clear_screen()
+                    for index , headline in enumerate(headlines):
+                        if index + 1 == int(user_input):
+                            self.display_article_summary(headline[1])
+                    headline_input = input('> ')
+                    if headline_input.lower() == 'r' or headline_input.lower() == 'return':
+                        continue
+                    if headline_input.lower() == 'q' or headline_input.lower() == 'quit':
+                        sys.exit()
+                    else:
+                        self.console.print(Panel(f'[red]Sorry, that is not a valid input'), justify='center')
+                elif user_input.lower() in categories:
+                    if user_input.lower() == 'local news':
+                        self.run_local_news()
+                    else:
+                        self.run_category_menu(user_input.lower(), all_headlines)
+                        if user_input.lower() == 'r' or user_input.lower() == 'return':
+                            break
+                        elif user_input.lower() == 'q' or user_input.lower() == 'quit':
+                            sys.exit()
+                else:
+                    self.console.print(Panel(f'Sorry, that is not a valid input'),justify='center')
+        except KeyboardInterrupt as error:
+            self.news.driver.quit()
+            self.news.driver.close()
+            self.console.print(f'[red]{error}', justify='center')
 
-            else:
-                self.console.print(Panel(f'Sorry, that is not a valid input'),justify='center')
 
 
     def main(self):
@@ -280,17 +306,12 @@ class Menu:
 
 
 
-# inspect('', methods=True)
-# inspect(Panel, methods=True)
-menu = Menu()
-menu.main()
-# menu.display_article_summary('https://www.bbc.com/news/world-europe-64013052')
-# # bbc_news = bbc.BBC()
-# # menu.display_article_summary('Hello')
-# # menu.ascii_art()
-# # # menu.progress_bar()
-# menu.make_headlines_table()
-# menu.categories_panel()
-# menu.query_user()
-# menu.get_user_input()
-# menu.display_category_news('Business')
+# news = news.News()
+# news.driver.quit()
+# inspect(news.driver, methods=True)
+if news.driver.service.service_url:
+    print("Webdriver is running at:", news.driver.service.service_url)
+else:
+    print("Webdriver is not running")
+# menu = Menu()
+# menu.main()
