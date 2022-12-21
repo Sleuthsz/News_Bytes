@@ -70,7 +70,7 @@ class BBC(news.News):
 
 if __name__ == "__main__":
     bbc = BBC()
-    #print(bbc.get_tech_headlines())
-    #print(bbc.get_sports_headlines())
-    #print(bbc.get_article_text('https://www.bbc.com/news/business-64010202'))
+    # print(bbc.get_tech_headlines())
+    # print(bbc.get_sports_headlines())
+    # print(bbc.get_article_text('https://www.bbc.com/news/business-64010202'))
     print(bbc.get_article_text('https://www.bbc.com/sport/football/63926145'))

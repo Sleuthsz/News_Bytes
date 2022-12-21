@@ -34,7 +34,7 @@ class CBS(news.News):
     def get_world_news_headlines(self):
         return self.get_headlines_and_links(CBS.WORLD_PAGE_URL, CBS.WORLD_PAGE_ID)
 
-    def get_tech_news_headlines(self):
+    def get_tech_headlines(self):
         return self.get_headlines_and_links(CBS.TECHNOLOGY_PAGE_URL, CBS.TECHNOLOGY_PAGE_ID)
 
     def get_sports_headlines(self):

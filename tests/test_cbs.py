@@ -25,7 +25,7 @@ def test_get_world_news_headlines(setup):
 
 
 def test_get_tech_news_headlines(setup):
-    tech_headlines_and_links = setup.get_tech_news_headlines()
+    tech_headlines_and_links = setup.get_tech_headlines()
     assert len(tech_headlines_and_links) > 0
 
 
@@ -53,7 +53,7 @@ def test_get_world_news_article_text(setup):
 
 
 def test_get_tech_news_article_text(setup):
-    tech_headlines_and_links = setup.get_tech_news_headlines()
+    tech_headlines_and_links = setup.get_tech_headlines()
     tech_article_text = setup.get_article_text(tech_headlines_and_links[0][1])
     assert len(tech_article_text) > 0
 

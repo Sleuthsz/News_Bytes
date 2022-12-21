@@ -4,7 +4,7 @@
 
 ### This application runs on the command line. 
 
-[News_Bytes Application](/news/bytes_app.py)
+[News_Bytes Application](/news_scraper/menu.py)
 ---
 ## Web Application
 
@@ -33,6 +33,19 @@
 #### V 1.2
 *Initial implementation of Rich library with headlines_table() and categories_panel() in menu.py. - 13 Dec 2022*
 
+#### V 1.3
+* Created nbc.py for webscrape of nbc website, updated README.md - December 14, 2022
+
+#### V 1.4
+* Finalized headline and link scrape, started categories scrape, updated README.md. - December 15, 2022
+
+* #### V 1.5
+* Created NBC class and refactored to methods. Troubleshooting methods working properly, updated README.md. - 
+* December 17, 2022 
+
+* #### V 1.6
+* README.md update - refactored NBC class and refactored to methods. Troubleshooting methods with team pivot of method 
+* names and organization, updated README.md. - December 18, 2022
 ---
 
 ## Getting Started
