@@ -4,13 +4,13 @@ import openai
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 
-import news
+from news_scraper.news import News
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-class CBS(news.News):
+class CBS(News):
     FRONT_PAGE_URL = "https://www.cbsnews.com/"
     BUSINESS_PAGE_URL = f"{FRONT_PAGE_URL}moneywatch"
     WORLD_PAGE_URL = f"{FRONT_PAGE_URL}world"

@@ -1,9 +1,9 @@
 from selenium.webdriver.common.by import By
 
-import news
+from news_scraper.news import News
 
 
-class Reuters(news.News):
+class Reuters(News):
     def __init__(self):
         super().__init__()
 
