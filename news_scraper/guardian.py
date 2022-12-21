@@ -1,9 +1,9 @@
 from selenium.webdriver.common.by import By
 
-import news
+from news_scraper.news import News
 
 
-class Guardian(news.News):
+class Guardian(News):
     def __init__(self):
         super().__init__()
 
