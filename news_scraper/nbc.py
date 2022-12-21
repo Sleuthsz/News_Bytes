@@ -30,7 +30,7 @@ class NBC:
     def get_article_text(self, link):
         self.driver.get(link)
         article = self.driver.find_element(By.TAG_NAME, "article")
-        elements = article.find_elements(By.XPATH, "//div[@data-component='text-block']")
+        elements = article.find_elements(By.TAG_NAME, 'p')
         text = ""
         for element in elements:
             text += element.text
