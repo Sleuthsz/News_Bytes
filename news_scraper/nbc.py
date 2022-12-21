@@ -81,8 +81,8 @@ class NBC:
         return headlines_links
 
 
-if __name__ == "__main__":
-    nbc = NBC()
+# if __name__ == "__main__":
+#     nbc = NBC()
     # working
     # headlines = nbc.get_news_headlines()
     # print(headlines)
@@ -94,36 +94,6 @@ if __name__ == "__main__":
     # print(sports)
     # tech = nbc.get_tech_headlines()
     # print(tech)
-    art = nbc.get_article_text("https://www.nbcnews.com/tech/social-media/twitter-bans-promotion-social-media-sites-facebook-instagram-truth-soc-rcna62305")
-    print(art)
+    # art = nbc.get_article_text("https://www.nbcnews.com/tech/social-media/twitter-bans-promotion-social-media-sites-facebook-instagram-truth-soc-rcna62305")
+    # print(art)
 
-    # ------------------unused until able to get rest working-------------
-    # article_text = get_article_text(links[1][1])
-    # summary = get_summary(article_text)
-    # print(summary)
-    # print(article_text)
-    # get_article_text()
-
-# -------- code for ChatGPT
-
-# homedir = os.path.expanduser("~")
-# webdriver_service = Service(f"{homedir}/chromedriver/stable/chromedriver")
-#
-# driver = webdriver.Chrome(options=options, service=webdriver_service)
-# driver.get("https://www.nbcnews.com/")
-# driver.implicitly_wait(1)
-
-#
-# def get_summary(text):
-#     prompt = f"{text}\n\nTl;dr"
-#     response = openai.Completion.create(
-#         model=openai_model,
-#         prompt=prompt,
-#         temperature=0.7,
-#         max_tokens=140,
-#         top_p=1.0,
-#         frequency_penalty=0.0,
-#         presence_penalty=1
-#     )
-#     return response["choices"][0]["text"]
-#
