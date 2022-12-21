@@ -33,6 +33,7 @@ class Menu:
 
     @lru_cache(maxsize=None)
     def get_headlines(self, category):
+
         headlines = []
         if category == "news" or category == "world news":
             text = category
@@ -149,7 +150,7 @@ class Menu:
         all_headlines[user_input] = category_methods[user_input]
         self.display_category_news(user_input, all_headlines[user_input])
 
-    def display_category_menu(self, category, all_headlines):
+    def run_category_menu(self, category, all_headlines):
         # Called in the run_app method
         while True:
             #called method at 210
@@ -198,10 +199,34 @@ class Menu:
 
         return local_news
 
+    def run_local_news(self):
+        while True:
+            local_input = input('Enter city: ')
+            local_heads = self.display_local_news(local_input)
 
+            if local_input.lower() == 'r' or local_input.lower() == 'return':
+                break
+            if local_input.lower() == 'q' or local_input.lower() == 'quit':
+                sys.exit()
 
+            local_input2 = input('> ')
+            if local_input2.lower() == 'r' or local_input2.lower() == 'return':
+                break
+            if local_input2.lower() == 'q' or local_input2.lower() == 'quit':
+                sys.exit()
 
+            if local_input2.isnumeric():
+                self.clear_screen()
+                for index, headline in enumerate(local_heads):
+                    if index + 1 == int(local_input2):
+                        self.display_article_summary(headline[1])
 
+                local_input3 = input('>')
+
+                if local_input3.lower() == 'r' or local_input3.lower() == 'return':
+                    break
+                if local_input3.lower() == 'q' or local_input3.lower() == 'quit':
+                    sys.exit()
 
     def run_app(self):
         categories = ["business", "world news", "tech", "sports", "local news"]
@@ -236,36 +261,9 @@ class Menu:
                     self.console.print(Panel(f'[red]Sorry, that is not a valid input'), justify='center')
             elif user_input.lower() in categories:
                 if user_input.lower() == 'local news':
-                    while True:
-                        local_input = input('Enter city: ')
-                        local_heads = self.display_local_news(local_input)
-
-                        if local_input.lower() == 'r' or local_input.lower() == 'return':
-                            break
-                        if local_input.lower() == 'q' or local_input.lower() == 'quit':
-                            sys.exit()
-
-                        local_input2 = input('> ')
-                        if local_input2.lower() == 'r' or local_input2.lower() == 'return':
-                            break
-                        if local_input2.lower() == 'q' or local_input2.lower() == 'quit':
-                            sys.exit()
-
-                        if local_input2.isnumeric():
-                            self.clear_screen()
-                            for index, headline in enumerate(local_heads):
-                                if index + 1 == int(local_input2):
-                                    self.display_article_summary(headline[1])
-
-                            local_input3 = input('>')
-
-                            if local_input3.lower() == 'r' or local_input3.lower() == 'return':
-                                break
-                            if local_input3.lower() == 'q' or local_input3.lower() == 'quit':
-                                sys.exit()
-
+                    self.run_local_news()
                 else:
-                    self.display_category_menu(user_input.lower(), all_headlines)
+                    self.run_category_menu(user_input.lower(), all_headlines)
                     if user_input.lower() == 'r' or user_input.lower() == 'return':
                         break
                     elif user_input.lower() == 'q' or user_input.lower() == 'quit':
