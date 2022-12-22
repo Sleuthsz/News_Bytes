@@ -30,3 +30,5 @@ pyfiglet~=0.8.post1
 Pygments~=2.13.0
 commonmark~=0.9.1
 mockito~=1.4.0
+coverage~=7.0.0
+mock~=4.0.3
