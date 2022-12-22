@@ -168,8 +168,8 @@ bugs in menu.py, cbs.py. Achieved MVP, Updated README.md. - December 19, 2022
 
 ## Authors
 
-Monika Davies
-Alejandro Rivera
-Daniel Brott
-Andy Nguyen
+Monika Davies  
+Alejandro Rivera  
+Daniel Brott  
+Andy Nguyen  
 Natalija Germek
