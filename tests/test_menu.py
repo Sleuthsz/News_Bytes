@@ -88,7 +88,7 @@ def test_make_headlines_table():
 
     # Assert that the Table object has the correct properties
     assert table.show_lines == True
-    assert table.row_styles == ["cyan", "magenta"]
+    assert table.row_styles == ["cyan", "light_sky_blue1"]
     assert table.title_justify == "center"
     assert table.box == box.HEAVY_EDGE
     assert table.highlight == True
