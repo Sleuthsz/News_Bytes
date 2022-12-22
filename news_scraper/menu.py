@@ -66,7 +66,7 @@ class Menu:
 
 
     def ascii_art(self):
-        self.console.print(pyfiglet.figlet_format("WELCOME TO\n NEWS BYTES", font="slant", width=200), justify="center")
+        self.console.print(pyfiglet.figlet_format("WELCOME TO\n NEWS BYTES", font="slant", width=200), justify="center", style="light_steel_blue")
 
     @staticmethod
     def clear_screen():
@@ -202,17 +202,17 @@ class Menu:
             local_news = self.axios.get_local_news(city)
             if local_news == 'City not found':
                 self.console.print(Panel(f'The city {city} was not found', style="red"),justify="center")
+            else:
+                table = Table(show_lines=True, row_styles=["cyan", "light_sky_blue1"], title_justify="center", box=box.HEAVY_EDGE,
+                              highlight=True)
 
-        table = Table(show_lines=True, row_styles=["cyan", "light_sky_blue1"], title_justify="center", box=box.HEAVY_EDGE,
-                      highlight=True)
+                table.add_column("#", justify="center")
+                table.add_column("[i]Local News", justify="center", style="light_steel_blue", header_style="light_sky_blue1")
 
-        table.add_column("#", justify="center")
-        table.add_column("[i]Local News", justify="center", style="light_steel_blue", header_style="light_sky_blue1")
-
-        for index, headline in enumerate(local_news):
-            table.add_row(str(index + 1), headline[0])
-        self.console.print(table, justify="center")
-        self.console.print(Panel('[light_steel_blue underline]Enter a [red]headline number [light_steel_blue]or enter [red underline](r)eturn [light_steel_blue]to return to the main menu or [red underline](q)uit.'), justify="center", style='Bold')
+                for index, headline in enumerate(local_news):
+                    table.add_row(str(index + 1), headline[0])
+                self.console.print(table, justify="center")
+                self.console.print(Panel('[light_steel_blue underline]Enter a [red]headline number [light_steel_blue]or enter [red underline](r)eturn [light_steel_blue]to return to the main menu or [red underline](q)uit.'), justify="center", style='Bold')
 
 
         return local_news

@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from dotenv import load_dotenv
 from news_scraper.news import News
 import os
 
@@ -37,39 +36,15 @@ class NBC(News):
         self.driver.implicitly_wait(1)
         section = self.driver.find_elements(By.TAG_NAME, 'section')[2]
         links = section.find_elements(By.TAG_NAME, 'a')
+        result_text = section.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
 
         headlines_links = []
-        for element in links:
-
-            link = element.get_attribute('href')
-            head = element.find_element(By.TAG_NAME, 'h2').text
-            headlines_links.append((head, link))
-        return headlines_links[0:10]
+        for link, headline in zip(links, result_text):
+                headlines_links.append((headline.text, link.get_attribute('href')))
+        return headlines_links[3:5]
 
     def get_tech_headlines(self):
-        tech_headlines = []
-        self.driver.get("https://www.nbcnews.com/tech-media")
-        self.driver.implicitly_wait(1)
-        section = self.driver.find_elements(By.TAG_NAME,'section')[2]
-        links = section.find_elements(By.TAG_NAME, 'a')
-        css_links = self.driver.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
-
-        for element, link in zip(css_links, links):
-            # Set a maximum number of iterations
-            max_iterations = 25
-            num_iterations = 0
-
-            # Keep trying to find a suitable link until the maximum number of iterations is reached
-            while link.get_attribute('href') == 'https://www.nbcnews.com/nbcblk' or link.get_attribute('href') == 'https://www.nbcnews.com/' and num_iterations < max_iterations:
-                link = self.driver.find_element(By.TAG_NAME, 'a')
-
-                num_iterations += 1
-
-            # If a suitable link was found, append the tuple to the tech_headlines list
-            if num_iterations < max_iterations:
-                tech_headlines.append((element.text, link.get_attribute('href')))
-
-        return tech_headlines
+        return self.get_category_headlines("https://www.nbcnews.com/tech-media")
 
     def get_business_headlines(self):
         return self.get_category_headlines("https://www.nbcnews.com/business")
