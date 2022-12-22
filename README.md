@@ -143,7 +143,7 @@ Enjoy staying up to date with the news of the day!
 ---
 ## Data Flow
 
-![Wireframe and Domain Model](img/wireframe&domain_model.png)
+![Wireframe and Domain Model](/Documentation/img/wireframe&domain_model.png)
 
 ---
 
