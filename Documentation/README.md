@@ -72,38 +72,54 @@ same naming conventions of files in individual news source scrapes, created addi
 * All scraping complete, final webscrape integrated, final refactoring completed, additional testing created and 
 README.md finalized, updated Trello Board. - December 20, 2022
 
+#### V 2.0
+* Testing complete, README complete and Trello Board complete. - December 21, 2022
 ---
 
 ## Getting Started
 
-Clone this repository to your local machine.
+Create a file to store your repository and clone this repository to your local machine.
 Install dependencies if not already installed, refer to dependencies in requirements.txt.
-In the command line run python3 bytes_app.py.
 
 ```
 $ git clone https://github.com/Sleuthsz/News_Bytes.git
 ```
 
-Once downloaded, activate your virtual environment and run by running your .venv file.
+Once downloaded, activate your virtual environment by running your .venv file.
 ```
 python3 -m venv .venv
-source .venv/bin/activate
+source ./.venv/bin/activate
 ```
 
 Navigate into your cloned down repository.
 ```
-cd YourRepo/YourProject
+cd Sleuthsz/News_Bytes
 ```
 
-Unit testing is included in the tests folder in your project using the pytest test framework.
+If you have not done so already, you will want to go to OpenAI and get an API key established. 
+
+Create your .env file to store your API key.
+```
+touch .env
+```
+
+Assign your API key to the variable name OPENAI_API_KEY.
+```
+OPENAI_API_KEY=API_key_received_from_OpenAI
+```
+
+Unit testing is included in the tests folder in this project using the pytest test framework.
 
 To run console application, initialize with the following code in your terminal.
 ```
 python3 news_scraper/menu.py
 ```
 
-Follow user input prompts. The initial scrape provided will be the top headlines and the option to access those, choose 
-a different category or quit application. Navigation options are selected as follows:
+Now it's time to follow user input prompts. The initial scrape provided will be the top headlines, the ways to access those articles is 
+by typing the number next to the article of interest in the input field. If you want to choose by category next, simply 
+type the category name and wait for the category headlines to populate.
+
+Additional navigation options are selected as follows:
 
 Return to prior headline screen:
 
@@ -116,7 +132,7 @@ Quit the application:
 'q' or 'quit'
 ```
 
-For category selections, enter the numeric representation next to the category intended.
+Enjoy staying up to date with the news of the day!
 
 ---
 
@@ -163,6 +179,8 @@ README.md. - December 18, 2022
 bugs in menu.py, cbs.py. Achieved MVP, Updated README.md. - December 19, 2022
 
 1.9 Completed nbc.py scrape and finalized menu.py. Integrated nbc.py scrape and added more tests. - December 20, 2022
+
+2.0 Completed README.md and concluded testing. - December 21, 2022
 
 ---
 
