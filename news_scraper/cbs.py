@@ -1,13 +1,6 @@
-import os
-
-import openai
-from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 
 from news_scraper.news import News
-
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class CBS(News):
