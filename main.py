@@ -6,7 +6,5 @@ from news_scraper.nbc import NBC
 
 
 if __name__ == '__main__':
-    # menu_exe = Menu()
-    # menu_exe.run_app()
-    nbc_news = NBC()
-    nbc_news.get_tech_headlines()
+    menu_exe = Menu()
+    menu_exe.run_app()

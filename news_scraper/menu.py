@@ -79,7 +79,7 @@ class Menu:
 
 
     def make_headlines_table(self, headlines):
-        table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
+        table = Table(show_lines=True, row_styles=["cyan", "light_sky_blue1"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
         table.add_column("[i]Headlines", justify="center", style="light_steel_blue", header_style="light_sky_blue1")
@@ -89,13 +89,13 @@ class Menu:
         self.console.print(table, justify="center")
 
     def categories_panel(self):
-        news_list:list[str] = ['[magenta]Business', '[blue]World News', '[magenta]Tech', '[blue]Sports',
-                               '[magenta]Local News']
+        news_list:list[str] = ['[light_sky_blue1]Business', '[blue]World News', '[light_sky_blue1]Tech', '[blue]Sports',
+                               '[light_sky_blue1]Local News']
         categories = [Panel(category, expand=True, box=box.HEAVY_EDGE) for category in news_list]
         self.console.print(Columns(categories), justify="center")
 
     def query_user(self):
-        self.console.print(Panel('Enter a [red]category [white]if you wish to see more headlines,\n otherwise enter in a headline number in order to get a summary \n with a link to the article. If you wish to quit, enter (q)uit'), justify="center", style='Bold')
+        self.console.print(Panel('[light_steel_blue]Enter a [red]category[light_steel_blue] if you wish to see more headlines,\n otherwise enter in a [red]headline number [light_steel_blue]in order to get a summary \n with a link to the article. If you wish to quit, enter [red underline](q)uit'), justify="center", style='Bold')
 
 
     def display_article_summary(self, link):
@@ -124,12 +124,11 @@ class Menu:
             fetch_and_display_summary(self.nbc)
 
         self.console.print(Panel(link), justify="center")
-        self.news.driver.quit()
 
         self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
 
     def display_category_news(self, category, headlines):
-        table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
+        table = Table(show_lines=True, row_styles=["cyan", "light_sky_blue1"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
 
         table.add_column("#", justify="center")
         if category.lower() == 'world news':
@@ -169,6 +168,7 @@ class Menu:
                 if category_input.lower() == 'r' or category_input.lower() == 'return':
                     break
                 elif category_input.lower() == 'q' or category_input.lower() == 'quit':
+                    self.news.driver.quit()
                     sys.exit()
                 if category_input.isnumeric():
                     #this iterates through the all_headlines dictionary lists at 250
@@ -182,6 +182,7 @@ class Menu:
                     if category_menu_input.lower() == 'r' or category_menu_input.lower() == 'return':
                         break
                     elif category_menu_input.lower() == 'q' or category_menu_input.lower() == 'quit':
+                        self.news.driver.quit()
                         sys.exit()
 
             self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
@@ -202,7 +203,7 @@ class Menu:
             if local_news == 'City not found':
                 self.console.print(Panel(f'The city {city} was not found', style="red"),justify="center")
 
-        table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE,
+        table = Table(show_lines=True, row_styles=["cyan", "light_sky_blue1"], title_justify="center", box=box.HEAVY_EDGE,
                       highlight=True)
 
         table.add_column("#", justify="center")
@@ -211,25 +212,29 @@ class Menu:
         for index, headline in enumerate(local_news):
             table.add_row(str(index + 1), headline[0])
         self.console.print(table, justify="center")
+        self.console.print(Panel('[light_steel_blue underline]Enter a [red]headline number [light_steel_blue]or enter [red underline](r)eturn [light_steel_blue]to return to the main menu or [red underline](q)uit.'), justify="center", style='Bold')
+
 
         return local_news
 
     def run_local_news(self):
         try:
             while True:
-                self.clear_screen()
                 local_input = input('Enter city: ')
+                self.clear_screen()
                 local_heads = self.display_local_news(local_input)
 
                 if local_input.lower() == 'r' or local_input.lower() == 'return':
                     break
                 if local_input.lower() == 'q' or local_input.lower() == 'quit':
+                    self.news.driver.quit()
                     sys.exit()
 
                 local_input2 = input('> ')
                 if local_input2.lower() == 'r' or local_input2.lower() == 'return':
                     break
                 if local_input2.lower() == 'q' or local_input2.lower() == 'quit':
+                    self.news.driver.quit()
                     sys.exit()
 
                 if local_input2.isnumeric():
@@ -243,6 +248,7 @@ class Menu:
                     if local_input3.lower() == 'r' or local_input3.lower() == 'return':
                         break
                     if local_input3.lower() == 'q' or local_input3.lower() == 'quit':
+                        self.news.driver.quit()
                         sys.exit()
         except KeyboardInterrupt as error:
             self.news.driver.quit()
@@ -277,6 +283,7 @@ class Menu:
                     if headline_input.lower() == 'r' or headline_input.lower() == 'return':
                         continue
                     if headline_input.lower() == 'q' or headline_input.lower() == 'quit':
+                        self.news.driver.quit()
                         sys.exit()
                 elif user_input.lower() in categories:
                     if user_input.lower() == 'local news':
@@ -286,6 +293,7 @@ class Menu:
                         if user_input.lower() == 'r' or user_input.lower() == 'return':
                             break
                         elif user_input.lower() == 'q' or user_input.lower() == 'quit':
+                            self.news.driver.quit()
                             sys.exit()
 
         except KeyboardInterrupt as error:

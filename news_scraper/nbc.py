@@ -69,8 +69,6 @@ class NBC(News):
             if num_iterations < max_iterations:
                 tech_headlines.append((element.text, link.get_attribute('href')))
 
-        print(tech_headlines)
-
         return tech_headlines
 
     def get_business_headlines(self):
@@ -98,10 +96,3 @@ class NBC(News):
         return headlines_links
 
 
-if __name__ == '__main__':
-    nbc_news = NBC()
-
-    nbc_news.get_tech_headlines()
-
-    for headline in nbcsnews.get_tech_headlines():
-        print(headline)
