@@ -184,3 +184,29 @@ def test_get_sports_article_text(setup):
     sports_article_text = setup.get_article_text(sports_headlines_and_links[0][1])
     assert "some sports news paragraph text" in sports_article_text
     unstub()
+
+
+def test_get_headlines_and_links(setup):
+    latest_news_element = WebElement(ANY, ANY)
+    article_element = mock({
+        "text": "some text"
+    })
+    heading_element = mock({
+        "text": "some headline"
+    })
+    anchor_element = mock({
+        "text": "some other text"
+    })
+    when(setup.driver).execute(ANY(str), ANY(dict)).thenReturn(ANY(dict))
+    when(setup.driver).find_element(ANY(str), ANY(str)).thenReturn(latest_news_element)
+    when(latest_news_element).find_elements(ANY(str), ANY(str)).thenReturn([article_element])
+    when(article_element).find_element(ANY(str), "h4").thenReturn(heading_element)
+    when(article_element).find_element(ANY(str), "a").thenReturn(anchor_element)
+    when(anchor_element).get_attribute(ANY(str)).thenReturn("www.some-link.com")
+
+    headlines_and_links = setup.get_headlines_and_links("www.some-url.com", "some element id")
+
+    assert len(headlines_and_links) == 1
+    assert headlines_and_links[0][0] == "some headline"
+    assert headlines_and_links[0][1] == "www.some-link.com"
+    unstub()
