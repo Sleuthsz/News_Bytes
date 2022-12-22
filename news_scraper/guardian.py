@@ -42,13 +42,3 @@ class Guardian(News):
 
         return headlines_links
 
-
-if __name__ == "__main__":
-    guardian = Guardian()
-    news = guardian.get_news_headlines()
-    business = guardian.get_business_headlines()
-    world_news = guardian.get_world_news_headlines()
-    tech = guardian.get_tech_headlines()
-    sports = guardian.get_sports_headlines()
-    # print(sports)
-    print(guardian.get_article_text(sports[0][1]))

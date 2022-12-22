@@ -1,12 +1,9 @@
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from rich.console import Console
 from rich.table import Table
 from rich import print
 from rich.panel import Panel
-from rich.progress import Progress, BarColumn, TextColumn
-from rich.progress import track
-from rich.theme import Theme
 import time
 from rich import inspect
 from rich.columns import Columns
@@ -16,19 +13,25 @@ import pyfiglet
 import sys
 import os
 from rich import box
-import bbc, guardian, cbs, reuters, news, axios, nbc
+from news_scraper.news import News
+from news_scraper.bbc import BBC
+from news_scraper.reuters import Reuters
+from news_scraper.axios import Axios
+from news_scraper.nbc import NBC
+from news_scraper.cbs import CBS
+from news_scraper.guardian import Guardian
 
 
 class Menu:
     def __init__(self):
         self.console = Console()
-        self.bbc = bbc.BBC()
-        self.nbc = nbc.NBC()
-        self.guardian = guardian.Guardian()
-        self.cbs = cbs.CBS()
-        self.reuters = reuters.Reuters()
-        self.axios = axios.Axios()
-        self.news = news.News()
+        self.bbc = BBC()
+        self.nbc = NBC()
+        self.guardian = Guardian()
+        self.cbs = CBS()
+        self.reuters = Reuters()
+        self.axios = Axios()
+        self.news = News()
         self.news_sources = [self.bbc, self.guardian, self.cbs, self.reuters, self.nbc]
 
 
@@ -59,10 +62,6 @@ class Menu:
                         raise ValueError(f'Invalid category: {category}, please enter a valid category')
                     headlines += future.result()[:2]
                 self.news.driver.quit()
-                if self.news.driver.service.service_url:
-                    print("Webdriver is running at:", self.news.driver.service.service_url)
-                else:
-                    print("Webdriver is not running")
         return headlines
 
 
@@ -109,7 +108,7 @@ class Menu:
             article = source.get_article_text(link)
             get_summary = self.news.get_summary(article)
             self.console.print(Panel(get_summary, width=100, box=box.HEAVY_EDGE, title='Summary', highlight=True),
-                               justify="center")
+                               justify="center", style="light_sky_blue1")
 
         if 'reuters' in link:
             fetch_and_display_summary(self.reuters)
@@ -126,10 +125,6 @@ class Menu:
 
         self.console.print(Panel(link), justify="center")
         self.news.driver.quit()
-        if self.news.driver.service.service_url:
-            print("Webdriver is running at:", self.news.driver.service.service_url)
-        else:
-            print("Webdriver is not running")
 
         self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
 
@@ -168,6 +163,7 @@ class Menu:
         try:
             while True:
                 #called method at 210
+                self.clear_screen()
                 self.get_category_headlines(category, all_headlines)
                 category_input = input('> ')
                 if category_input.lower() == 'r' or category_input.lower() == 'return':
@@ -191,7 +187,7 @@ class Menu:
             self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
         except KeyboardInterrupt as error:
             self.news.driver.quit()
-            self.console.print(f'[red]{error}', justify='center')
+            print(error)
 
     def display_main_menu(self, headlines):
         #called in the run_app method
@@ -203,6 +199,8 @@ class Menu:
     def display_local_news(self, city):
         with self.console.status(f"Getting local news from {city}...", spinner="shark"):
             local_news = self.axios.get_local_news(city)
+            if local_news == 'City not found':
+                self.console.print(Panel(f'The city {city} was not found', style="red"),justify="center")
 
         table = Table(show_lines=True, row_styles=["cyan", "magenta"], title_justify="center", box=box.HEAVY_EDGE,
                       highlight=True)
@@ -219,6 +217,7 @@ class Menu:
     def run_local_news(self):
         try:
             while True:
+                self.clear_screen()
                 local_input = input('Enter city: ')
                 local_heads = self.display_local_news(local_input)
 
@@ -246,10 +245,10 @@ class Menu:
                     if local_input3.lower() == 'q' or local_input3.lower() == 'quit':
                         sys.exit()
         except KeyboardInterrupt as error:
-            news.driver.quit()
-            self.console.print(f'[red]{error}', justify='center')
+            self.news.driver.quit()
+            print(error)
 
-    def run_app(self):
+    def initiate_app(self):
         categories = ["business", "world news", "tech", "sports", "local news"]
         all_headlines = {
             "business": None,
@@ -279,8 +278,6 @@ class Menu:
                         continue
                     if headline_input.lower() == 'q' or headline_input.lower() == 'quit':
                         sys.exit()
-                    else:
-                        self.console.print(Panel(f'[red]Sorry, that is not a valid input'), justify='center')
                 elif user_input.lower() in categories:
                     if user_input.lower() == 'local news':
                         self.run_local_news()
@@ -290,28 +287,14 @@ class Menu:
                             break
                         elif user_input.lower() == 'q' or user_input.lower() == 'quit':
                             sys.exit()
-                else:
-                    self.console.print(Panel(f'Sorry, that is not a valid input'),justify='center')
+
         except KeyboardInterrupt as error:
             self.news.driver.quit()
-            self.news.driver.close()
-            self.console.print(f'[red]{error}', justify='center')
+            print(error)
 
 
-
-    def main(self):
+    def run_app(self):
         self.clear_screen()
         self.ascii_art()
-        self.run_app()
+        self.initiate_app()
 
-
-
-# news = news.News()
-# news.driver.quit()
-# inspect(news.driver, methods=True)
-if news.driver.service.service_url:
-    print("Webdriver is running at:", news.driver.service.service_url)
-else:
-    print("Webdriver is not running")
-# menu = Menu()
-# menu.main()
