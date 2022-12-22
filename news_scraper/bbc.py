@@ -2,7 +2,6 @@ from selenium.webdriver.common.by import By
 
 from news_scraper.news import News
 
-
 class BBC(News):
     def __init__(self):
         super().__init__()
@@ -67,10 +66,3 @@ class BBC(News):
             text += element.text
         return text
 
-
-if __name__ == "__main__":
-    bbc = BBC()
-    # print(bbc.get_tech_headlines())
-    # print(bbc.get_sports_headlines())
-    # print(bbc.get_article_text('https://www.bbc.com/news/business-64010202'))
-    print(bbc.get_article_text('https://www.bbc.com/sport/football/63926145'))
