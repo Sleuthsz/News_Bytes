@@ -115,8 +115,11 @@ To run console application, initialize with the following code in your terminal.
 python3 news_scraper/menu.py
 ```
 
-Follow user input prompts. The initial scrape provided will be the top headlines and the option to access those, choose 
-a different category or quit application. Navigation options are selected as follows:
+Now it's time to follow user input prompts. The initial scrape provided will be the top headlines, the ways to access those articles is 
+by typing the number next to the article of interest in the input field. If you want to choose by category next, simply 
+type the category name and wait for the category headlines to populate.
+
+Additional navigation options are selected as follows:
 
 Return to prior headline screen:
 
@@ -128,8 +131,6 @@ Quit the application:
 ```
 'q' or 'quit'
 ```
-
-For category selections, enter the numeric representation next to the category intended.
 
 Enjoy staying up to date with the news of the day!
 
