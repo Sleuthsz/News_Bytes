@@ -9,7 +9,7 @@ class Reuters(News):
 
     def get_news_headlines(self, link="https://www.reuters.com/"):
         self.driver.get(link)
-        self.driver.implicitly_wait(1)
+        self.driver.implicitly_wait(0.5)
 
         heads = self.driver.find_elements(By.XPATH, "//a[@data-testid='Heading']")
 

@@ -24,6 +24,7 @@ class Guardian(News):
 
     def get_article_text(self, link):
         self.driver.get(link)
+        self.driver.implicitly_wait(0.5)
         article = self.driver.find_element(By.TAG_NAME, "article")
         elements = article.find_elements(By.TAG_NAME, "p")
 

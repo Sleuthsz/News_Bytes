@@ -11,7 +11,7 @@ class NBC(News):
         super().__init__()
 
         self.driver.get("https://www.nbcnews.com")
-        self.driver.implicitly_wait(1)
+        self.driver.implicitly_wait(0.5)
 
     def get_news_headlines(self):
         link = self.driver.find_elements(By.CLASS_NAME, "related-content__headline-link")
