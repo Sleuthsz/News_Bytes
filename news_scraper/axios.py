@@ -27,7 +27,7 @@ class Axios(News):
         url = 'https://www.axios.com/local/' + city.lower()
 
         self.driver.get(url)
-        self.driver.implicitly_wait(1)
+        self.driver.implicitly_wait(0.5)
 
         main_content = self.driver.find_elements(By.XPATH, '//*[@id="main-content"]//h2')
 

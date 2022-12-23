@@ -36,6 +36,7 @@ class CBS(News):
     def get_headlines_and_links(self, link, element_id):
         article_headlines_and_links = []
         self.driver.get(link)
+        self.driver.implicitly_wait(0.5)
         latest_news_element = self.driver.find_element(By.ID, element_id)
         article_elements = latest_news_element.find_elements(By.TAG_NAME, "article")
         for article_element in article_elements:
