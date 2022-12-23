@@ -89,7 +89,7 @@ class Menu:
         self.console.print(table, justify="center")
 
     def categories_panel(self):
-        news_list:list[str] = ['[light_sky_blue1]Business', '[blue]World News', '[light_sky_blue1]Tech', '[blue]Sports',
+        news_list:list[str] = ['[light_sky_blue1]Business', '[cyan]World News', '[light_sky_blue1]Tech', '[cyan]Sports',
                                '[light_sky_blue1]Local News']
         categories = [Panel(category, expand=True, box=box.HEAVY_EDGE) for category in news_list]
         self.console.print(Columns(categories), justify="center")
