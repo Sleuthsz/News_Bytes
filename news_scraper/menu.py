@@ -125,7 +125,7 @@ class Menu:
 
         self.console.print(Panel(link), justify="center")
 
-        self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
+        self.console.print(Panel('[light_steel_blue underline]Enter a [red]headline number [light_steel_blue]or enter [red underline](r)eturn [light_steel_blue]to return to the main menu or [red underline](q)uit.'),justify="center", style='Bold')
 
     def display_category_news(self, category, headlines):
         table = Table(show_lines=True, row_styles=["cyan", "light_sky_blue1"], title_justify="center", box=box.HEAVY_EDGE, highlight=True)
@@ -156,6 +156,7 @@ class Menu:
 
         all_headlines[user_input] = category_methods[user_input]
         self.display_category_news(user_input, all_headlines[user_input])
+        self.console.print(Panel('[light_steel_blue underline]Enter a [red]headline number [light_steel_blue]or enter [red underline](r)eturn [light_steel_blue]to return to the main menu or [red underline](q)uit.'),justify="center", style='Bold')
 
     def run_category_menu(self, category, all_headlines):
         # Called in the run_app method
@@ -185,7 +186,7 @@ class Menu:
                         self.news.driver.quit()
                         sys.exit()
 
-            self.console.print(f'Input (r)eturn to return to the main menu or type (q) to quit', justify="center")
+
         except KeyboardInterrupt as error:
             self.news.driver.quit()
             print(error)
@@ -295,6 +296,7 @@ class Menu:
                         elif user_input.lower() == 'q' or user_input.lower() == 'quit':
                             self.news.driver.quit()
                             sys.exit()
+
 
         except KeyboardInterrupt as error:
             self.news.driver.quit()
