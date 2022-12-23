@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from news_scraper.news import News
+from news import News
 import os
 
 
@@ -36,27 +36,28 @@ class NBC(News):
         self.driver.implicitly_wait(1)
         section = self.driver.find_elements(By.TAG_NAME, 'section')[2]
         links = section.find_elements(By.TAG_NAME, 'a')
-        result_text = section.find_elements(By.CLASS_NAME, "wide-tease-item__headline")
 
         headlines_links = []
-        for link, headline in zip(links, result_text):
-                headlines_links.append((headline.text, link.get_attribute('href')))
-        return headlines_links[3:5]
+        for element in links:
 
-    def get_tech_headlines(self):
-        return self.get_category_headlines("https://www.nbcnews.com/tech-media")
+            link = element.get_attribute('href')
+            try:
+                head = element.find_element(By.TAG_NAME, 'h2').text
+            except:
+                continue
+
+            headlines_links.append((head, link))
+
+        return headlines_links[0:10]
 
     def get_business_headlines(self):
         return self.get_category_headlines("https://www.nbcnews.com/business")
 
     def get_world_news_headlines(self):
-        self.driver.get('https://www.nbcnews.com/world')
-        world_news_link = self.driver.find_elements(By.CLASS_NAME, "related-content__headline-link")
+        return self.get_category_headlines("https://www.nbcnews.com/world")
 
-        world_news_headlines_links = []
-        for i in range(len(world_news_link)):
-            world_news_headlines_links.append((world_news_link[i].text, world_news_link[i].get_attribute('href')))
-        return world_news_headlines_links
+    def get_tech_headlines(self):
+        return self.get_category_headlines("https://www.nbcnews.com/tech-media")
 
     def get_sports_headlines(self):
         self.driver.get('https://www.nbcsports.com/')
@@ -71,3 +72,9 @@ class NBC(News):
         return headlines_links
 
 
+if __name__ == "__main__":
+    nbc = NBC()
+    #print(nbc.get_sports_headlines())
+    #print(nbc.get_article_text('https://www.nbcnews.com/business/consumer/401k-retirement-plan-changes-who-is
+    # -eligible-spending-bill-rcna62751'))
+    print(nbc.get_news_headlines())
