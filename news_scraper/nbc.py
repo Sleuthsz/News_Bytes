@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from news import News
+from news_scraper.news import News
 import os
 
 
@@ -71,10 +71,3 @@ class NBC(News):
             headlines_links.append((a.text, a.get_attribute('href')))
         return headlines_links
 
-
-if __name__ == "__main__":
-    nbc = NBC()
-    #print(nbc.get_sports_headlines())
-    #print(nbc.get_article_text('https://www.nbcnews.com/business/consumer/401k-retirement-plan-changes-who-is
-    # -eligible-spending-bill-rcna62751'))
-    print(nbc.get_news_headlines())
